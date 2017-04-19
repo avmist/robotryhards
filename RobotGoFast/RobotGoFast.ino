@@ -1,3 +1,5 @@
+#include <AnalogSmooth.h>
+
 void printDouble( double val, unsigned int precision){
 // prints val with number of decimal places determine by precision
 // NOTE: precision is 1 followed by the number of zeros for the desired number of decimial places
@@ -34,7 +36,7 @@ public:
   static const double stepsPerRevolution;
   static const double microsteps;
   static const double wheelDiameter; // In inches
-  static const unsigned long minDelay;
+  static const unsigned long maxSpeed;
   
 private:
 
@@ -79,7 +81,7 @@ const int Stepper::enablePin = 4;
 const double Stepper::stepsPerRevolution = 200;
 const double Stepper::microsteps = 8;
 const double Stepper::wheelDiameter = 2.838; // In Inches
-const unsigned long Stepper::minDelay = 250; // In uS
+const unsigned long Stepper::maxSpeed = 21; // Inches / Second
 
 // Constructors
 Stepper::Stepper(int stepPin, int dirPin, bool reversed) : stepPin(stepPin), dirPin(dirPin), reversed(reversed) {
@@ -148,8 +150,8 @@ void Stepper::update() {
 }
 
 void Stepper::set(double speed, Direction direction) {
-  
-  this->speed = speed;
+
+  this->speed = fmin(speed, maxSpeed);
   this->direction = direction;
 
   if(reversed) {
@@ -173,7 +175,7 @@ void Stepper::set(double speed, Direction direction) {
   // Calculate step delay
 
   // Calculate speed as an RPM
-  double rpm = 60 * speed / (PI * wheelDiameter);
+  double rpm = 60 * this->speed / (PI * wheelDiameter);
   printDouble(rpm, 100000);
   
   double stepsPerMinute = rpm * stepsPerRevolution * microsteps;
@@ -182,7 +184,7 @@ void Stepper::set(double speed, Direction direction) {
   double secondsPerStep = 60.0f / stepsPerMinute;
   printDouble(secondsPerStep, 100000);
   
-  this->delay = fmax(Stepper::minDelay, secondsPerStep * 1000000.0f);
+  this->delay = secondsPerStep * 1000000.0f;
   
   printDouble(this->delay, 100000);
   Serial.println();
@@ -374,6 +376,11 @@ Stepper leftMotor(1, 0, false);
 Stepper rightMotor(3, 2, true);
 LED led(13, 12, 11);
 
+AnalogSmooth as0 = AnalogSmooth();
+AnalogSmooth as1 = AnalogSmooth();
+AnalogSmooth as2 = AnalogSmooth();
+AnalogSmooth as3 = AnalogSmooth();
+
 void setup() {
 
   analogWriteResolution(10);
@@ -415,13 +422,13 @@ unsigned long lastStatusPing = 0;
 
 void debug() {
 
-  /*Serial.print(analogRead(ir0));
+  Serial.print(as0.analogReadSmooth(ir0));
   Serial.print(" ");
-  Serial.print(analogRead(ir1));
+  Serial.print(as1.analogReadSmooth(ir1));
   Serial.print(" ");
-  Serial.print(analogRead(ir2));
+  Serial.print(as2.analogReadSmooth(ir2));
   Serial.print(" ");
-  Serial.println(analogRead(ir3));*/
+  Serial.println(as3.analogReadSmooth(ir3));
 
   if(state == IDLE && (micros() - lastStatusPing) > 500000) {
     led.blink(LED::GREEN, 250000);
