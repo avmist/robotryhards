@@ -1,24 +1,4 @@
-void printDouble( double val, unsigned int precision){
-// prints val with number of decimal places determine by precision
-// NOTE: precision is 1 followed by the number of zeros for the desired number of decimial places
-// example: printDouble( 3.1415, 100); // prints 3.14 (two decimal places)
-
-   Serial.print (int(val));  //prints the int part
-   Serial.print("."); // print the decimal point
-   unsigned int frac;
-   if(val >= 0)
-     frac = (val - int(val)) * precision;
-   else
-      frac = (int(val)- val ) * precision;
-   int frac1 = frac;
-   while( frac1 /= 10 )
-       precision /= 10;
-   precision /= 10;
-   while(  precision /= 10)
-       Serial.print("0");
-
-   Serial.println(frac,DEC) ;
-}
+enum Direction { FORWARD, BACKWARD };
 
 // ====================================================
 // Stepper
@@ -28,13 +8,10 @@ class Stepper {
 
 public:
 
-  enum Direction { FORWARD, BACKWARD };
-
   static const int enablePin;
-  static const double stepsPerRevolution;
-  static const double microsteps;
-  static const double wheelDiameter; // In inches
-  static const unsigned long minDelay;
+  static const float stepsPerRevolution;
+  static const float microsteps;
+  static const float wheelDiameter; // In inches
   
 private:
 
@@ -44,7 +21,7 @@ private:
   unsigned long lastUpdateTime; // In uS
   unsigned long stepCount; // In microsteps
   unsigned long delay; // In uS
-  double speed; // In Inches / Second
+  float speed; // In Inches / Second
   
   Direction direction;
   
@@ -59,7 +36,7 @@ public:
   Stepper(int stepPin, int dirPin, bool reversed);
 
   // Methods
-  void set(double speed, Direction direction);
+  void set(float speed, Direction direction);
 
   // Statics
   static void enableAll();
@@ -76,10 +53,9 @@ private:
 Stepper * Stepper::steppers[2];
 bool Stepper::enabled = false;
 const int Stepper::enablePin = 4;
-const double Stepper::stepsPerRevolution = 200;
-const double Stepper::microsteps = 8;
-const double Stepper::wheelDiameter = 2.838; // In Inches
-const unsigned long Stepper::minDelay = 250; // In uS
+const float Stepper::stepsPerRevolution = 200;
+const float Stepper::microsteps = 8;
+const float Stepper::wheelDiameter = 2.838; // In inches
 
 // Constructors
 Stepper::Stepper(int stepPin, int dirPin, bool reversed) : stepPin(stepPin), dirPin(dirPin), reversed(reversed) {
@@ -96,10 +72,6 @@ Stepper::Stepper(int stepPin, int dirPin, bool reversed) : stepPin(stepPin), dir
   // Set pin modes
   pinMode(dirPin, OUTPUT);
   pinMode(stepPin, OUTPUT);
-
-  // Initial Values
-  digitalWrite(dirPin, LOW);
-  digitalWrite(stepPin, LOW);
 
 }
 
@@ -128,64 +100,28 @@ void Stepper::update() {
   unsigned long t = micros();
   unsigned long dt = t - lastUpdateTime;
 
-  if(dt > delay) {
-
-    // Step motor
-    if(delay > 0) {
-
-      // Don't step if the speed is set to zero, just reset the lastUpdateTime
-      digitalWrite(stepPin, HIGH);
-      delayMicroseconds(2);
-      digitalWrite(stepPin, LOW);
-      delayMicroseconds(2);
-      
-    }
-    
-    lastUpdateTime = t;
-    
-  }
+  
+  
   
 }
 
-void Stepper::set(double speed, Direction direction) {
+void Stepper::set(float speed, Direction direction) {
   
   this->speed = speed;
   this->direction = direction;
 
-  if(reversed) {
-
-    if(direction == Stepper::FORWARD) {
-      digitalWrite(dirPin, HIGH);
-    } else {
-      digitalWrite(dirPin, LOW);
-    }
-    
-  } else {
-
-    if(direction == Stepper::FORWARD) {
-      digitalWrite(dirPin, LOW);
-    } else {
-      digitalWrite(dirPin, HIGH);
-    }
-    
-  }
-
   // Calculate step delay
-
-  // Calculate speed as an RPM
-  double rpm = 60 * speed / (PI * wheelDiameter);
-  printDouble(rpm, 100000);
   
-  double stepsPerMinute = rpm * stepsPerRevolution * microsteps;
-  printDouble(stepsPerMinute, 100000);
+  // Speed = Distance / Time (Inches / Second)
   
-  double secondsPerStep = 60.0f / stepsPerMinute;
-  printDouble(secondsPerStep, 100000);
+  // Degree per Step = 360 / (stepsPerRevolution / microsteps)
+  float degPerSec = 360.f / (stepsPerRevolution / microsteps);
   
-  this->delay = fmax(Stepper::minDelay, secondsPerStep * 1000000.0f);
+  // Distance Per Step = wheelDiameter * 2 * M_PI * (Degree per Step / 360)
+  float distPerStep = wheelDiameter * 2.f * M_PI * (degPerSec / 360.f);
   
-  printDouble(this->delay, 100000);
-  Serial.println();
+  // Delay = speed * (1 / Distance Per Step)
+  this->delay = speed * (1 / distPerStep);
   
 }
 
@@ -320,7 +256,7 @@ void LED::toggle(Color color) {
     analogWrite(pins[color], 1023);
   } else {
     on[color] = true;
-    analogWrite(pins[color], 512);
+    analogWrite(pins[color], 0);
   }
   
 }
@@ -361,7 +297,7 @@ void LED::off(Color color) {
 // Main Loop
 // ====================================================
 
-enum RobotState { IDLE, RUNNING };
+enum RobotState { IDLE, RUNNING_OK };
 enum RobotState state = IDLE;
 
 // Globals
@@ -370,8 +306,8 @@ const int ir1 = A1;
 const int ir2 = A2;
 const int ir3 = A3;
 
-Stepper leftMotor(1, 0, false);
-Stepper rightMotor(3, 2, true);
+Stepper leftMotor(0, 1, false);
+Stepper rightMotor(2, 3, true);
 LED led(13, 12, 11);
 
 void setup() {
@@ -387,10 +323,6 @@ void setup() {
   pinMode(ir3, INPUT);
   
   Serial.begin(9600);
-
-  //Stepper::enableAll();
-  //leftMotor.set(21, Stepper::FORWARD);
-  //rightMotor.set(21, Stepper::FORWARD);
   
 }
 
@@ -398,10 +330,9 @@ void loop() {
 
   // Do HLTM
 
-  // Stepper update
-  Stepper::updateAll();
+  // Do stepper update
+  //Stepper::updateAll();
 
-  // LED Update
   LED::updateAll();
 
   // Do position update
@@ -415,19 +346,18 @@ unsigned long lastStatusPing = 0;
 
 void debug() {
 
-  /*Serial.print(analogRead(ir0));
+  Serial.print(analogRead(ir0));
   Serial.print(" ");
   Serial.print(analogRead(ir1));
   Serial.print(" ");
   Serial.print(analogRead(ir2));
   Serial.print(" ");
-  Serial.println(analogRead(ir3));*/
+  Serial.println(analogRead(ir3));
 
+  
   if(state == IDLE && (micros() - lastStatusPing) > 500000) {
     led.blink(LED::GREEN, 250000);
     lastStatusPing = micros();
-  } else if(state == RUNNING) {
-    led.solid(LED::GREEN);
   }
   
 }

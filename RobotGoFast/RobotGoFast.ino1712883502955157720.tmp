@@ -131,20 +131,13 @@ void Stepper::update() {
   if(dt > delay) {
 
     // Step motor
-    if(delay > 0) {
-
-      // Don't step if the speed is set to zero, just reset the lastUpdateTime
-      digitalWrite(stepPin, HIGH);
-      delayMicroseconds(2);
-      digitalWrite(stepPin, LOW);
-      delayMicroseconds(2);
-      
-    }
-    
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(2);
+    digitalWrite(stepPin, LOW);
     lastUpdateTime = t;
+    delayMicroseconds(2);
     
   }
-  
 }
 
 void Stepper::set(double speed, Direction direction) {

@@ -1,25 +1,3 @@
-void printDouble( double val, unsigned int precision){
-// prints val with number of decimal places determine by precision
-// NOTE: precision is 1 followed by the number of zeros for the desired number of decimial places
-// example: printDouble( 3.1415, 100); // prints 3.14 (two decimal places)
-
-   Serial.print (int(val));  //prints the int part
-   Serial.print("."); // print the decimal point
-   unsigned int frac;
-   if(val >= 0)
-     frac = (val - int(val)) * precision;
-   else
-      frac = (int(val)- val ) * precision;
-   int frac1 = frac;
-   while( frac1 /= 10 )
-       precision /= 10;
-   precision /= 10;
-   while(  precision /= 10)
-       Serial.print("0");
-
-   Serial.println(frac,DEC) ;
-}
-
 // ====================================================
 // Stepper
 // ====================================================
@@ -34,12 +12,11 @@ public:
   static const double stepsPerRevolution;
   static const double microsteps;
   static const double wheelDiameter; // In inches
-  static const unsigned long minDelay;
+  static const unsigned long minDelay; // In uS
   
 private:
 
   const int stepPin;
-  const int dirPin;
   const bool reversed;
   unsigned long lastUpdateTime; // In uS
   unsigned long stepCount; // In microsteps
@@ -79,7 +56,7 @@ const int Stepper::enablePin = 4;
 const double Stepper::stepsPerRevolution = 200;
 const double Stepper::microsteps = 8;
 const double Stepper::wheelDiameter = 2.838; // In Inches
-const unsigned long Stepper::minDelay = 250; // In uS
+const unsigned long Stepper::minDelay = 220; // In uS
 
 // Constructors
 Stepper::Stepper(int stepPin, int dirPin, bool reversed) : stepPin(stepPin), dirPin(dirPin), reversed(reversed) {
@@ -131,20 +108,13 @@ void Stepper::update() {
   if(dt > delay) {
 
     // Step motor
-    if(delay > 0) {
-
-      // Don't step if the speed is set to zero, just reset the lastUpdateTime
-      digitalWrite(stepPin, HIGH);
-      delayMicroseconds(2);
-      digitalWrite(stepPin, LOW);
-      delayMicroseconds(2);
-      
-    }
-    
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(2);
+    digitalWrite(stepPin, LOW);
     lastUpdateTime = t;
+    delayMicroseconds(2);
     
   }
-  
 }
 
 void Stepper::set(double speed, Direction direction) {
@@ -171,21 +141,23 @@ void Stepper::set(double speed, Direction direction) {
   }
 
   // Calculate step delay
+  
+  // Speed = Distance / Time (Inches / Second)
+  
+  // Degree per Step = 360 / stepsPerRevolution / microsteps
+  double degPerStep = 360.f / stepsPerRevolution / microsteps;
 
-  // Calculate speed as an RPM
-  double rpm = 60 * speed / (PI * wheelDiameter);
-  printDouble(rpm, 100000);
+  Serial.println(degPerStep);
   
-  double stepsPerMinute = rpm * stepsPerRevolution * microsteps;
-  printDouble(stepsPerMinute, 100000);
+  // Distance Per Step = wheelDiameter * 2 * M_PI * (Degree per Step / 360)
+  double distPerStep = wheelDiameter * 2.f * M_PI * (degPerStep / 360.f);
+
+  Serial.println(distPerStep);
   
-  double secondsPerStep = 60.0f / stepsPerMinute;
-  printDouble(secondsPerStep, 100000);
-  
-  this->delay = fmax(Stepper::minDelay, secondsPerStep * 1000000.0f);
-  
-  printDouble(this->delay, 100000);
-  Serial.println();
+  // Delay = speed * (1 / Distance Per Step)
+  this->delay = floor(Stepper::minDelay, speed * (1 / distPerStep));
+
+  Serial.println(this->delay);
   
 }
 
@@ -388,9 +360,9 @@ void setup() {
   
   Serial.begin(9600);
 
-  //Stepper::enableAll();
-  //leftMotor.set(21, Stepper::FORWARD);
-  //rightMotor.set(21, Stepper::FORWARD);
+  Stepper::enableAll();
+  leftMotor.set(0.05, Stepper::FORWARD);
+  rightMotor.set(0.05, Stepper::FORWARD);
   
 }
 
