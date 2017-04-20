@@ -1,5 +1,7 @@
 #include <AnalogSmooth.h>
 
+const double wheelSpacing = 4.268; // In inches
+
 void printDouble( double val, unsigned int precision){
 // prints val with number of decimal places determine by precision
 // NOTE: precision is 1 followed by the number of zeros for the desired number of decimial places
@@ -376,10 +378,10 @@ Stepper leftMotor(1, 0, false);
 Stepper rightMotor(3, 2, true);
 LED led(13, 12, 11);
 
-AnalogSmooth as0 = AnalogSmooth();
+/*AnalogSmooth as0 = AnalogSmooth();
 AnalogSmooth as1 = AnalogSmooth();
 AnalogSmooth as2 = AnalogSmooth();
-AnalogSmooth as3 = AnalogSmooth();
+AnalogSmooth as3 = AnalogSmooth();*/
 
 void setup() {
 
@@ -395,9 +397,9 @@ void setup() {
   
   Serial.begin(9600);
 
-  //Stepper::enableAll();
-  //leftMotor.set(21, Stepper::FORWARD);
-  //rightMotor.set(21, Stepper::FORWARD);
+  Stepper::enableAll();
+  leftMotor.set(21, Stepper::FORWARD);
+  rightMotor.set(21, Stepper::FORWARD);
   
 }
 
@@ -422,13 +424,21 @@ unsigned long lastStatusPing = 0;
 
 void debug() {
 
-  Serial.print(as0.analogReadSmooth(ir0));
+  /*Serial.print(as0.analogReadSmooth(ir0));
   Serial.print(" ");
   Serial.print(as1.analogReadSmooth(ir1));
   Serial.print(" ");
   Serial.print(as2.analogReadSmooth(ir2));
   Serial.print(" ");
-  Serial.println(as3.analogReadSmooth(ir3));
+  Serial.println(as3.analogReadSmooth(ir3));*/
+
+  /*Serial.print(analogRead(ir0));
+  Serial.print(" ");
+  Serial.print(analogRead(ir1));
+  Serial.print(" ");
+  Serial.print(analogRead(ir2));
+  Serial.print(" ");
+  Serial.println(analogRead(ir3));*/
 
   if(state == IDLE && (micros() - lastStatusPing) > 500000) {
     led.blink(LED::GREEN, 250000);
