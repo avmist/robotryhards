@@ -1,7 +1,7 @@
 #include <AnalogSmooth.h>
 
 const double wheelSpacing = 4.268; // In inches
-enum RobotState { IDLE, RUNNING, ERROR };
+enum RobotState { IDLE, RUNNING, ERROR, COMPLETE };
 enum RobotState state = IDLE;
 
 void printDouble( double val, unsigned int precision){
@@ -499,6 +499,10 @@ TurnTask::TurnTask(Task * mom, Task * dad, int deg) : Task(mom, dad) {
 
 bool TurnTask::update() {
 
+  Serial.print("Turn Task\n");
+
+  return false;
+
 }
 
 // ====================================================
@@ -520,18 +524,15 @@ public:
   
 };
 
-StartTask::StartTask(Task * parent) : Task(parent){
-  Stepper::enableAll();
-  state = RUNNING;
-}
+StartTask::StartTask(Task * parent) : Task(parent) {}
 
-StartTask::StartTask(Task * mom, Task * dad) : Task(mom, dad){
-  Stepper::enableAll();
-  state = RUNNING;
-}
+StartTask::StartTask(Task * mom, Task * dad) : Task(mom, dad) {}
 
 bool StartTask::update() {
-  
+  Serial.print("Start Task\n");
+  Stepper::enableAll();
+  state = RUNNING;
+  return true;
 }
 
 // ====================================================
@@ -553,18 +554,15 @@ public:
   
 };
 
-StopTask::StopTask(Task * parent) : Task(parent) {
-  Stepper::disableAll();
-  state = IDLE;
-}
+StopTask::StopTask(Task * parent) : Task(parent) {}
 
-StopTask::StopTask(Task * mom, Task * dad) : Task(mom, dad) {
-  Stepper::disableAll();
-  state = IDLE;
-}
+StopTask::StopTask(Task * mom, Task * dad) : Task(mom, dad) {}
 
 bool StopTask::update() {
-  
+  Serial.print("Stop Task");
+  Stepper::disableAll();
+  state = COMPLETE;
+  return false;
 }
 
 // ====================================================
@@ -702,12 +700,16 @@ HLTM::HLTM(Task * rootTask) {
 
 void HLTM::update() {
 
+  //Serial.print("Boop\n");
+
   if(currentTask == NULL) {
+    Serial.print("Task is NULL\n");
     state = ERROR;
     return;
   }
   
   if(currentTask->update()) {
+    Serial.print("Advancing Task\n");
     currentTask = currentTask->getUntreversedChild();
   }
   
@@ -748,11 +750,11 @@ void setup() {
   
   Serial.begin(9600);
 
-  //
-  
 }
 
 void loop() {
+
+  //Serial.print("Update\n");
 
   // Do HLTM
   hal.update();
@@ -765,7 +767,6 @@ void loop() {
 
   // Do position update
   
-
   // Do debug output
   debug();
   
@@ -796,8 +797,11 @@ void debug() {
     lastStatusPing = micros();
   } else if(state == RUNNING) {
     led.solid(LED::GREEN);
-  } else if(state == RUNNING) {
+  } else if(state == ERROR) {
     led.solid(LED::RED);
+  } else if(state == COMPLETE) {
+    led.blink(LED::BLUE, 250000);
+    lastStatusPing = micros();
   }
   
 }
