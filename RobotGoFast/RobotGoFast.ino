@@ -1,7 +1,7 @@
 #include <AnalogSmooth.h>
 
 const double wheelSpacing = 4.268; // In inches
-enum RobotState { IDLE, RUNNING };
+enum RobotState { IDLE, RUNNING, ERROR };
 enum RobotState state = IDLE;
 
 void printDouble( double val, unsigned int precision){
@@ -399,6 +399,7 @@ public:
   // Methods
   //virtual void update();
   bool update();
+  Task * getUntreversedChild();
 
 private:
 
@@ -450,6 +451,20 @@ void Task::addParent(Task * task) {
 }
 
 bool Task::update() {
+  
+}
+
+Task * Task::getUntreversedChild() {
+
+  for(int i = 0; i < numChildren; ++i) {
+
+    if(children[i]->traversed) {
+      return children[i];
+    }
+    
+  }
+
+  return NULL;
   
 }
 
@@ -686,7 +701,16 @@ HLTM::HLTM(Task * rootTask) {
 }
 
 void HLTM::update() {
-  currentTask->update();
+
+  if(currentTask == NULL) {
+    state = ERROR;
+    return;
+  }
+  
+  if(currentTask->update()) {
+    currentTask = currentTask->getUntreversedChild();
+  }
+  
 }
 
 
@@ -772,6 +796,8 @@ void debug() {
     lastStatusPing = micros();
   } else if(state == RUNNING) {
     led.solid(LED::GREEN);
+  } else if(state == RUNNING) {
+    led.solid(LED::RED);
   }
   
 }
