@@ -66,6 +66,8 @@ public:
 
   // Methods
   void set(double speed, Direction direction);
+  unsigned long getCount();
+  void resetCount();
 
   // Statics
   static void enableAll();
@@ -144,6 +146,7 @@ void Stepper::update() {
       delayMicroseconds(2);
       digitalWrite(stepPin, LOW);
       delayMicroseconds(2);
+      stepCount++;
       
     }
     
@@ -191,10 +194,16 @@ void Stepper::set(double speed, Direction direction) {
   this->delay = secondsPerStep * 1000000.0f;
   
   printDouble(this->delay, 100000);
-  Serial.println();
   
 }
 
+unsigned long Stepper::getCount() {
+  return this->stepCount;
+}
+
+void Stepper::resetCount() {
+  this->stepCount = 0;
+}
 
 
 // ====================================================
@@ -389,7 +398,7 @@ public:
 
   // Methods
   //virtual void update();
-  void update();
+  bool update();
 
 private:
 
@@ -440,7 +449,7 @@ void Task::addParent(Task * task) {
   parents[numParents++] = task;
 }
 
-void Task::update() {
+bool Task::update() {
   
 }
 
@@ -461,7 +470,7 @@ public:
   TurnTask(Task * mom, Task * dad, int deg);
 
   // Methods
-  void update();
+  bool update();
   
 };
 
@@ -473,9 +482,8 @@ TurnTask::TurnTask(Task * mom, Task * dad, int deg) : Task(mom, dad) {
   this->deg = deg;
 }
 
-void TurnTask::update() {
+bool TurnTask::update() {
 
-  
 }
 
 // ====================================================
@@ -493,7 +501,7 @@ public:
   StartTask(Task * mom, Task * dad);
 
   // Methods
-  void update();
+  bool update();
   
 };
 
@@ -507,7 +515,7 @@ StartTask::StartTask(Task * mom, Task * dad) : Task(mom, dad){
   state = RUNNING;
 }
 
-void StartTask::update() {
+bool StartTask::update() {
   
 }
 
@@ -526,7 +534,7 @@ public:
   StopTask(Task * mom, Task * dad);
 
   // Methods
-  void update();
+  bool update();
   
 };
 
@@ -540,7 +548,7 @@ StopTask::StopTask(Task * mom, Task * dad) : Task(mom, dad) {
   state = IDLE;
 }
 
-void StopTask::update() {
+bool StopTask::update() {
   
 }
 
