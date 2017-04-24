@@ -1,6 +1,8 @@
 #include <AnalogSmooth.h>
 
 const double wheelSpacing = 4.268; // In inches
+enum RobotState { IDLE, RUNNING };
+enum RobotState state = IDLE;
 
 void printDouble( double val, unsigned int precision){
 // prints val with number of decimal places determine by precision
@@ -21,7 +23,7 @@ void printDouble( double val, unsigned int precision){
    while(  precision /= 10)
        Serial.print("0");
 
-   Serial.println(frac,DEC) ;
+   Serial.println(frac,DEC);
 }
 
 // ====================================================
@@ -362,11 +364,327 @@ void LED::off(Color color) {
 }
 
 // ====================================================
-// Main Loop
+// Task
 // ====================================================
 
-enum RobotState { IDLE, RUNNING };
-enum RobotState state = IDLE;
+class Task {
+
+public:
+
+protected:
+
+  Task * parents[2];
+  int numParents;
+  Task * children[2];
+  int numChildren;
+  static Task * currentTask;
+  bool traversed;
+  bool finished;
+  
+public:
+
+  // Constructors
+  Task(Task * parent);
+  Task(Task * mom, Task * dad);
+
+  // Methods
+  //virtual void update();
+  void update();
+
+private:
+
+  // Methods
+  void addChild(Task * task);
+  void addParent(Task * task);
+  
+};
+
+Task::Task(Task * parent) {
+   
+  numParents = 0;
+  numChildren = 0;
+  
+  // Add to parents list
+  this->addParent(parent);
+  
+  // Add to parents children list
+  this->parents[0]->addChild(this);
+
+  traversed = false;
+  finished = false;
+  
+}
+
+Task::Task(Task * mom, Task * dad) {
+
+  numParents = 0;
+  numChildren = 0;
+
+  // Add to parents list
+  this->addParent(mom);
+  this->addParent(dad);
+
+  // Add to children list
+  this->parents[0]->addChild(this);
+  this->parents[1]->addChild(this);
+
+  traversed = false;
+  
+}
+
+void Task::addChild(Task * task) {
+  children[numChildren++] = task;
+}
+
+void Task::addParent(Task * task) {
+  parents[numParents++] = task;
+}
+
+void Task::update() {
+  
+}
+
+// ====================================================
+// TurnTask
+// ====================================================
+
+class TurnTask : public Task {
+
+private:
+
+  int deg;
+
+public:
+
+  // Constructors
+  TurnTask(Task * parent, int deg);
+  TurnTask(Task * mom, Task * dad, int deg);
+
+  // Methods
+  void update();
+  
+};
+
+TurnTask::TurnTask(Task * parent, int deg) : Task(parent) {
+  this->deg = deg;
+}
+
+TurnTask::TurnTask(Task * mom, Task * dad, int deg) : Task(mom, dad) {
+  this->deg = deg;
+}
+
+void TurnTask::update() {
+
+  
+}
+
+// ====================================================
+// StartTask
+// ====================================================
+
+class StartTask : public Task {
+
+private:
+
+public:
+
+  // Constructors
+  StartTask(Task * parent);
+  StartTask(Task * mom, Task * dad);
+
+  // Methods
+  void update();
+  
+};
+
+StartTask::StartTask(Task * parent) : Task(parent){
+  Stepper::enableAll();
+  state = RUNNING;
+}
+
+StartTask::StartTask(Task * mom, Task * dad) : Task(mom, dad){
+  Stepper::enableAll();
+  state = RUNNING;
+}
+
+void StartTask::update() {
+  
+}
+
+// ====================================================
+// StopTask
+// ====================================================
+
+class StopTask : public Task {
+
+private:
+
+public:
+
+  // Constructors
+  StopTask(Task * parent);
+  StopTask(Task * mom, Task * dad);
+
+  // Methods
+  void update();
+  
+};
+
+StopTask::StopTask(Task * parent) : Task(parent) {
+  Stepper::disableAll();
+  state = IDLE;
+}
+
+StopTask::StopTask(Task * mom, Task * dad) : Task(mom, dad) {
+  Stepper::disableAll();
+  state = IDLE;
+}
+
+void StopTask::update() {
+  
+}
+
+// ====================================================
+// Task tree
+// ====================================================
+
+/*
+ * S = Start
+ * E = End
+ * . = Junction
+ *   = Traversable
+ * X = Not Traversable
+ * 
+ * Starting Orientation
+ *  |
+ * \ /
+ * 
+ * ST    P2    X  X  X  X  X  X
+ *    X  X     X  X  X  X  X  X
+ *    X  X  J2    P5       X  X
+ *    X  X  P3 X  X  X     X  X
+ * P1       J1    P4       X  X
+ * X  X  X  X  X  X  X  J3        
+ * X  X  X  X  X  X  X  X  X   
+ * X  X  X  X  X  X  X  X  X  P6
+ * X  X  X  X  X  X  X  X  X   
+ * X  X  X  X  X  X  X  X  X  ED
+ */
+ 
+// Chain 1 Start @ Start
+/*Task root(NULL, Task::START);
+Task t1_1(&root, Task::FORWARD);
+Task t1_2(&t1_1, Task::FORWARD);
+Task t1_3(&t1_2, Task::FORWARD);
+Task t1_4(&t1_3, Task::FORWARD);
+TurnTask t1_5(&t1_4, -90);
+Task t1_6(&t1_5, Task::FORWARD);
+Task t1_7(&t1_6, Task::FORWARD);
+Task t1_8(&t1_7, Task::FORWARD);
+// Chain 1 End @ J1
+
+// Chain 2 Start @ Start
+TurnTask t2_1(&root, -90;
+Task t2_2(&t2_1, Task::FORWARD);
+Task t2_3(&t2_2, Task::FORWARD);
+Task t2_4(&t2_3, Task::FORWARD);
+Task t2_5(&t2_4, Task::RIGHT);
+Task t2_6(&t2_5, Task::FORWARD);
+Task t2_7(&t2_6, Task::FORWARD);
+Task t2_8(&t2_7, -90);
+// Chain 2 End @ J2
+
+// Chain 3a Start @ J1
+Task t3a_1(&t1_8, -90);
+Task t3a_2(&t3a_1, Task::FORWARD);
+Task t3a_3(&t3a_2, Task::FORWARD);
+Task t3a_4(&t3a_4, 90);
+// Chain 3a End @ J2
+
+// Chain 3b Start @ J2
+Task t3b_1(&t2_8, 90);
+Task t3b_2(&t3b_1, Task::FORWARD);
+Task t3b_3(&t3b_2, Task::FORWARD);
+Task t3b_4(&t3b_3, -90);
+// Chain 3b End @ J1
+
+// Chain 4 Start @ J1
+Task t4_1(&t1_8, Task::FORWARD);
+Task t4_2(&t4_1, Task::FORWARD);
+Task t4_3(&t4_2, Task::FORWARD);
+Task t4_4(&t4_3, Task::FORWARD);
+Task t4_5(&t4_4, 90);
+Task t4_6(&t4_5, Task::FORWARD);
+// Chain 4 End @ J3
+
+// Chain 5 Start @ J2
+Task t5_1(&t2_8, Task::FORWARD);
+Task t5_2(&t5_1, Task::FORWARD);
+Task t5_3(&t5_2, Task::FORWARD);
+Task t5_4(&t5_3, Task::FORWARD);
+Task t5_5(&t5_4, 90);
+Task t5_6(&t5_5, Task::FORWARD);
+Task t5_7(&t5_6, Task::FORWARD);
+Task t5_8(&t5_7, Task::FORWARD);
+// Chain 5 End @ J3
+
+// Chain 6 Start @ J3
+Task t6_1(&t5_8, Task::LEFT);
+Task t6_2(&t6_1, Task::FORWARD);
+Task t6_3(&t6_2, Task::FORWARD);
+Task t6_4(&t6_3, Task::RIGHT);
+Task t6_5(&t6_4, Task::FORWARD);
+Task t6_6(&t6_5, Task::FORWARD);
+Task t6_7(&t6_6, Task::FORWARD);
+Task t6_8(&t6_7, Task::FORWARD);
+Task t6_9(&t6_8, Task::STOP);*/
+// Chain 5 End @ End
+
+// Turn test
+StartTask turn(NULL);
+TurnTask turn1(&turn, 90);
+StopTask turn2(&turn1);
+
+// ====================================================
+// HLTM
+// ====================================================
+
+class HLTM {
+
+public:
+
+private:
+  
+  Task * rootTask;
+  Task * currentTask;
+  
+public:
+  
+  // Constructors
+  HLTM(Task * rootTask);
+  
+  // Statics
+
+  // Methods
+  void update();
+  
+private:
+  
+};
+
+HLTM::HLTM(Task * rootTask) {
+  this->rootTask = rootTask;
+  this->currentTask = rootTask;
+}
+
+void HLTM::update() {
+  currentTask->update();
+}
+
+
+// ====================================================
+// Main Loop
+// ====================================================
 
 // Globals
 const int ir0 = A0;
@@ -377,6 +695,7 @@ const int ir3 = A3;
 Stepper leftMotor(1, 0, false);
 Stepper rightMotor(3, 2, true);
 LED led(13, 12, 11);
+HLTM hal(&turn);
 
 /*AnalogSmooth as0 = AnalogSmooth();
 AnalogSmooth as1 = AnalogSmooth();
@@ -397,16 +716,15 @@ void setup() {
   
   Serial.begin(9600);
 
-  Stepper::enableAll();
-  leftMotor.set(21, Stepper::FORWARD);
-  rightMotor.set(21, Stepper::FORWARD);
+  //
   
 }
 
 void loop() {
 
   // Do HLTM
-
+  hal.update();
+  
   // Stepper update
   Stepper::updateAll();
 
@@ -414,6 +732,7 @@ void loop() {
   LED::updateAll();
 
   // Do position update
+  
 
   // Do debug output
   debug();
