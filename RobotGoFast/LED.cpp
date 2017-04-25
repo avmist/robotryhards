@@ -49,6 +49,7 @@ void LED::update() {
     }
     
   }
+  
   // Green
   if (states[LED::GREEN] == LED::BLINKING && on[LED::GREEN]) {
 

@@ -11,8 +11,13 @@ void HLTM::init() {
 void HLTM::update() {
 
   //Serial.print("Boop\n");
-  
-  if(currentTask->type == Task::START) {
+
+  if(currentTask == nullptr) {
+    
+    Serial.print("Task is NULL\n");
+    state = ERROR;
+    
+  } else if(currentTask->type == Task::START) {
 
     StartTask * startTask = static_cast<StartTask*>(currentTask);
     if(startTask->update()) {
@@ -51,11 +56,6 @@ void HLTM::update() {
       currentTask = goTask->getUntreversedChild();
       this->currentTask->init();
     }
-    
-  } else if(currentTask->type == NULL) {
-    
-    Serial.print("Task is NULL\n");
-    state = ERROR;
     
   } else {
     

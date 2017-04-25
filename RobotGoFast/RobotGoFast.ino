@@ -12,30 +12,6 @@
 #include "HLTM.h"
 #include "math.h"
 
-const double IR_SPACING = 4.6625;
-
-void printDouble( double val, unsigned int precision){
-// prints val with number of decimal places determine by precision
-// NOTE: precision is 1 followed by the number of zeros for the desired number of decimial places
-// example: printDouble( 3.1415, 100); // prints 3.14 (two decimal places)
-
-   Serial.print (int(val));  //prints the int part
-   Serial.print("."); // print the decimal point
-   unsigned int frac;
-   if(val >= 0)
-     frac = (val - int(val)) * precision;
-   else
-      frac = (int(val)- val ) * precision;
-   int frac1 = frac;
-   while( frac1 /= 10 )
-       precision /= 10;
-   precision /= 10;
-   while(  precision /= 10)
-       Serial.print("0");
-
-   Serial.print(frac,DEC);
-}
-
 /* ST    P2    X  X  X  X  X  X
  *    X  X     X  X  X  X  X  X
  *    X  X  J2    P5       X  X
@@ -179,12 +155,12 @@ void setup() {
   
   Serial.begin(9600);
 
-  ir0.addDatapoint(19, 12);
-  ir0.addDatapoint(22, 11.5);
-  ir0.addDatapoint(27, 11);
-  ir0.addDatapoint(33, 10.5);
-  ir0.addDatapoint(45, 10);
-  ir0.addDatapoint(52, 9.5);
+  //ir0.addDatapoint(19, 12);
+  //ir0.addDatapoint(22, 11.5);
+  //ir0.addDatapoint(27, 11);
+  //ir0.addDatapoint(33, 10.5);
+  //ir0.addDatapoint(45, 10);
+  //ir0.addDatapoint(52, 9.5);
   ir0.addDatapoint(63, 9);
   ir0.addDatapoint(76, 8.5);
   ir0.addDatapoint(87, 8);
@@ -200,12 +176,12 @@ void setup() {
   ir0.addDatapoint(365, 3);
   ir0.addDatapoint(480, 2.5);
 
-  ir1.addDatapoint(16, 12);
-  ir1.addDatapoint(22, 11.5);
-  ir1.addDatapoint(25, 11);
-  ir1.addDatapoint(33, 10.5);
-  ir1.addDatapoint(39, 10);
-  ir1.addDatapoint(51, 9.5);
+  //ir1.addDatapoint(16, 12);
+  //ir1.addDatapoint(22, 11.5);
+  //ir1.addDatapoint(25, 11);
+  //ir1.addDatapoint(33, 10.5);
+  //ir1.addDatapoint(39, 10);
+  //ir1.addDatapoint(51, 9.5);
   ir1.addDatapoint(69, 9);
   ir1.addDatapoint(75, 8.5);
   ir1.addDatapoint(93, 8);
@@ -221,12 +197,12 @@ void setup() {
   ir1.addDatapoint(370, 3);
   ir1.addDatapoint(500, 2.5);
 
-  ir2.addDatapoint(25, 12);
-  ir2.addDatapoint(38, 11.5);
-  ir2.addDatapoint(44, 11);
-  ir2.addDatapoint(50, 10.5);
-  ir2.addDatapoint(62, 10);
-  ir2.addDatapoint(68, 9.5);
+  //ir2.addDatapoint(25, 12);
+  //ir2.addDatapoint(38, 11.5);
+  //ir2.addDatapoint(44, 11);
+  //ir2.addDatapoint(50, 10.5);
+  //ir2.addDatapoint(62, 10);
+  //ir2.addDatapoint(68, 9.5);
   ir2.addDatapoint(78, 9);
   ir2.addDatapoint(93, 8.5);
   ir2.addDatapoint(105, 8);
@@ -242,12 +218,12 @@ void setup() {
   ir2.addDatapoint(386, 3);
   ir2.addDatapoint(510, 2.5);
 
-  ir3.addDatapoint(14, 12);
-  ir3.addDatapoint(19, 11.5);
-  ir3.addDatapoint(22, 11);
-  ir3.addDatapoint(26, 10.5);
-  ir3.addDatapoint(38, 10);
-  ir3.addDatapoint(48, 9.5);
+  //ir3.addDatapoint(14, 12);
+  //ir3.addDatapoint(19, 11.5);
+  //ir3.addDatapoint(22, 11);
+  //ir3.addDatapoint(26, 10.5);
+  //ir3.addDatapoint(38, 10);
+  //ir3.addDatapoint(48, 9.5);
   ir3.addDatapoint(58, 9);
   ir3.addDatapoint(70, 8.5);
   ir3.addDatapoint(83, 8);
@@ -274,7 +250,7 @@ void setup() {
 void loop() {
 
   // Do HLTM
-  //hal.update();
+  hal.update();
   
   // Stepper update
   Stepper::updateAll();
@@ -300,77 +276,7 @@ void debug() {
   Serial.print(as2.analogReadSmooth(ir2));
   Serial.print(" ");
   Serial.println(as3.analogReadSmooth(ir3));*/
-
-  double val0 = ir0.read();
-  if(val0 == LinearFit::TOO_FAR) {
-    Serial.print(" FAR ");
-  } else if(val0 == LinearFit::TOO_CLOSE) {
-    Serial.print("CLOSE");
-  } else {
-    printDouble(val0, 100);
-  }
   
-  Serial.print(" ");
-  
-  double val1 = ir1.read();
-  if(val1 == LinearFit::TOO_FAR) {
-    Serial.print("FAR  ");
-  } else if(val1 == LinearFit::TOO_CLOSE) {
-    Serial.print("CLOSE");
-  } else {
-    printDouble(val1, 100);
-  }
-  
-  Serial.print(" ");
-  
-  double val2 = ir2.read();
-  if(val2 == LinearFit::TOO_FAR) {
-    Serial.print("FAR  ");
-  } else if(val2 == LinearFit::TOO_CLOSE) {
-    Serial.print("CLOSE");
-  } else {
-    printDouble(val2, 100);
-  }
-  
-  Serial.print(" ");
-  
-  double val3 = ir3.read();
-  if(val3 == LinearFit::TOO_FAR) {
-    Serial.print("FAR  ");
-  } else if(val3 == LinearFit::TOO_CLOSE) {
-    Serial.print("CLOSE");
-  } else {
-    printDouble(val3, 100);
-  }
-  
-  Serial.print(" ");
-
-  // Calculate angle on left
-  double angleLeft = atan(abs(val0 - val1) / IR_SPACING);
-  angleLeft = angleLeft * 180.0 / PI;
-  
-  if(val0 > val1) {
-    angleLeft *= -1;
-  }
-  
-  Serial.print(" l-a ");
-  printDouble(angleLeft, 100);
-  
-  Serial.print(" ");
-
-  // Calculate angle on right
-  double angleRight = atan(abs(val2 - val3) / IR_SPACING);
-  angleRight = angleRight * 180.0 / PI;
-  
-  if(val3 > val3) {
-    angleRight *= -1;
-  }
-  
-  Serial.print(" r-a ");
-  printDouble(angleRight, 100);
-  
-  Serial.println();
-
   if(state == IDLE && (micros() - lastStatusPing) > 500000) {
     
     led.off(LED::GREEN);
@@ -378,7 +284,7 @@ void debug() {
     led.blink(LED::RED, 250000);
     lastStatusPing = micros();
     
-  } else if(state == RUNNING) {
+  } else if(state == RUNNING && (micros() - lastStatusPing) > 500000) {
     
     led.off(LED::RED);
     led.off(LED::BLUE);
@@ -395,7 +301,7 @@ void debug() {
     
     led.off(LED::GREEN);
     led.off(LED::RED);
-    led.blink(LED::BLUE, 250000);
+    led.solid(LED::BLUE);
     lastStatusPing = micros();
     
   }

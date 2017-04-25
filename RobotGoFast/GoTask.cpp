@@ -10,7 +10,112 @@ GoTask::GoTask(Task * mom, Task * dad, double distance, String name) : Task(GO, 
 
 bool GoTask::update() {
 
-  if(distance > 0) {
+  double d0 = ir0.read();
+  if(d0 == LinearFit::TOO_FAR) {
+    Serial.print(" FAR ");
+  } else if(d0 == LinearFit::TOO_CLOSE) {
+    Serial.print("CLOSE");
+  } else {
+    printDouble(d0, 100);
+  }
+  
+  Serial.print(" ");
+  
+  if(d1 == LinearFit::TOO_FAR) {
+    Serial.print(" FAR ");
+  } else if(d1 == LinearFit::TOO_CLOSE) {
+    Serial.print("CLOSE");
+  } else {
+    printDouble(d1, 100);
+  }
+  
+  Serial.print(" ");
+
+  double aveDistLeft = (d0 + d1) / 2.0;
+  
+  double d2 = ir2.read();
+  if(d2 == LinearFit::TOO_FAR) {
+    Serial.print(" FAR ");
+  } else if(d2 == LinearFit::TOO_CLOSE) {
+    Serial.print("CLOSE");
+  } else {
+    printDouble(d2, 100);
+  }
+  
+  Serial.print(" ");
+  
+  double d3 = ir3.read();
+  if(d3 == LinearFit::TOO_FAR) {
+    Serial.print(" FAR ");
+  } else if(d3 == LinearFit::TOO_CLOSE) {
+    Serial.print("CLOSE");
+  } else {
+    printDouble(d3, 100);
+  }
+  
+  Serial.print(" ");
+
+  double aveDistRight = (d2 + d3) / 2.0;
+
+  // Calculate angle on left
+  double angleLeft = atan(abs(d0 - d1) / IR_SPACING);
+  angleLeft = angleLeft * 180.0 / PI;
+  
+  if(d0 > d1) {
+    angleLeft *= -1;
+  }
+  
+  Serial.print(" l-a ");
+  printDouble(angleLeft, 100);
+  
+  Serial.print(" ");
+
+  // Calculate angle on right
+  double angleRight = atan(abs(d2 - d3) / IR_SPACING);
+  angleRight = angleRight * 180.0 / PI;
+  
+  if(d2 > d3) {
+    angleRight *= -1;
+  }
+  
+  Serial.print(" r-a ");
+  printDouble(angleRight, 100);
+  Serial.println();
+
+  if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR && d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
+
+    // Both sides against wall - best case for wall tracking
+
+    if((micros() - lastStatusPing) > 500000) {
+      led.blink(LED::BLUE, 250000);
+      led.blink(LED::RED, 250000);
+      lastStatusPing = micros();
+      Serial.println("Both walls detected");
+    }
+    
+  } else if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR) {
+
+    // Left side against wall
+    
+    if((micros() - lastStatusPing) > 500000) {
+      led.blink(LED::BLUE, 250000);
+      lastStatusPing = micros();
+      Serial.println("Left wall detected");
+    }
+    
+  } else if(d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
+
+    // Right side against wall
+
+    if((micros() - lastStatusPing) > 500000) {
+      led.blink(LED::RED, 250000);
+      lastStatusPing = micros();
+      Serial.println("Right wall detected");
+    }
+    
+  }
+
+  /*if(distance > 0) {
     leftMotor.set(20, Stepper::FORWARD);
     rightMotor.set(20, Stepper::FORWARD);
   } else {
@@ -22,7 +127,7 @@ bool GoTask::update() {
     leftMotor.stop();
     rightMotor.stop();
     return true;
-  }
+  }*/
   
   return false;
 
@@ -58,5 +163,7 @@ void GoTask::init() {
   Serial.print("Need to step: ");
   Serial.print(steps);
   Serial.print(" times.\n");
+
+  lastStatusPing = micros();
   
 }
