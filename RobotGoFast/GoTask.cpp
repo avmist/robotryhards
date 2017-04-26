@@ -73,11 +73,13 @@ bool GoTask::update() {
 
   //Calculate Intent
   Vec2 intent = (rightPos.unit() * -leftPos.size() + leftPos.unit() * -rightPos.size()).unit();	//avoid
-  intent = intent + (leftDir * leftDir.size() + rightDir * rightDir.size()).unit();	//follow
+  intent = intent + (leftDir * rightPos.size() + rightDir * leftPos.size()).unit();	//follow
   float turnAmt = Vec2(1.f, 0.f).cross(intent.unit());
 
   leftMotor.set(15 - turnAmt * 5, Stepper::FORWARD);
   rightMotor.set(15 + turnAmt * 5, Stepper::FORWARD);
+
+  printDouble(turnAmt, 100);	//how fucked is turnAmt?
   
 
   if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR && d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {

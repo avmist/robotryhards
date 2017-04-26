@@ -53,5 +53,5 @@ Vec2 Vec2::unit(){
 Vec2 Vec2::intersect(Vec2 p, Vec2 r, Vec2 q, Vec2 s) { 
 	float rs = r.cross(s);			//local rs = r:cross(s)
 	Vec2 qp = q-p;					//local qp = q-p
-	return p + r * qp.cross(s) / rs;	//p + r * qp:cross(s)/rs
+	return p + (r * qp.cross(s) / rs);	//p + r * qp:cross(s)/rs
 }
