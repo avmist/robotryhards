@@ -11,50 +11,50 @@ GoTask::GoTask(Task * mom, Task * dad, double distance, String name) : Task(GO, 
 bool GoTask::update() {
 
   double d0 = ir0.read();
-  if(d0 == LinearFit::TOO_FAR) {
+  /*if(d0 == LinearFit::TOO_FAR) {
     Serial.print(" FAR ");
   } else if(d0 == LinearFit::TOO_CLOSE) {
     Serial.print("CLOSE");
   } else {
     printDouble(d0, 100);
-  }
+  }*/
   
-  Serial.print(" ");
+  //Serial.print(" ");
   
   double d1 = ir1.read();
-  if(d1 == LinearFit::TOO_FAR) {
+  /*if(d1 == LinearFit::TOO_FAR) {
     Serial.print(" FAR ");
   } else if(d1 == LinearFit::TOO_CLOSE) {
     Serial.print("CLOSE");
   } else {
     printDouble(d1, 100);
-  }
+  }*/
   
-  Serial.print(" ");
+  //Serial.print(" ");
 
   double aveDistLeft = (d0 + d1) / 2.0;
   
   double d2 = ir2.read();
-  if(d2 == LinearFit::TOO_FAR) {
+  /*if(d2 == LinearFit::TOO_FAR) {
     Serial.print(" FAR ");
   } else if(d2 == LinearFit::TOO_CLOSE) {
     Serial.print("CLOSE");
   } else {
     printDouble(d2, 100);
-  }
+  }*/
   
-  Serial.print(" ");
+  //Serial.print(" ");
   
   double d3 = ir3.read();
-  if(d3 == LinearFit::TOO_FAR) {
+  /*if(d3 == LinearFit::TOO_FAR) {
     Serial.print(" FAR ");
   } else if(d3 == LinearFit::TOO_CLOSE) {
     Serial.print("CLOSE");
   } else {
     printDouble(d3, 100);
-  }
+  }*/
   
-  Serial.print(" ");
+  //Serial.print(" ");
 
   //double aveDistRight = (d2 + d3) / 2.0;	//TODO: find out what this does
   //Calculate seen wall points
@@ -88,7 +88,7 @@ bool GoTask::update() {
       led.solid(LED::BLUE);
       led.solid(LED::RED);
       lastStatusPing = micros();
-      Serial.println("Both walls detected");
+      //Serial.println("Both walls detected");
     }
     
   } else if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR) {
@@ -99,7 +99,7 @@ bool GoTask::update() {
       led.solid(LED::BLUE);
       led.off(LED::RED);
       lastStatusPing = micros();
-      Serial.println("Left wall detected");
+      //Serial.println("Left wall detected");
     }
     
   } else if(d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
@@ -110,7 +110,7 @@ bool GoTask::update() {
       led.solid(LED::RED);
       led.off(LED::BLUE);
       lastStatusPing = micros();
-      Serial.println("Right wall detected");
+      //Serial.println("Right wall detected");
     }
     
   }

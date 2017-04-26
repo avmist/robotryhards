@@ -6,8 +6,6 @@
 
 #include <SparkFunMPU9250-DMP.h>
 
-#define SerialPort SerialUSB
-
 class IMU {
 
 public:

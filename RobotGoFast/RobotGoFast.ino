@@ -259,7 +259,7 @@ void loop() {
   hal.update();
 
   // Do position update
-  imu.update();
+  //imu.update();
   
   // Stepper update
   Stepper::updateAll();
@@ -303,7 +303,7 @@ void debug() {
   Serial.print(" H ");
   Serial.println();*/
 
-  Serial.println();
+  //Serial.println();
 
   /*Serial.print(as0.analogReadSmooth(ir0));
   Serial.print(" ");
