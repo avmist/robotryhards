@@ -276,14 +276,34 @@ unsigned long lastStatusPing = 0;
 
 void debug() {
 
-  Serial.print("P ");
-  printDouble(imu.pitch, 100);
+  /*Serial.print("P ");
+  printDouble(imu.pitch, 100);*/
   Serial.print(" Y ");
   printDouble(imu.yaw, 100);
-  Serial.print(" R ");
-  printDouble(imu.roll, 100);
+  /*Serial.print(" R ");
+  printDouble(imu.roll, 100);*/
   Serial.print(" H ");
   printDouble(imu.heading, 100);
+  Serial.println();
+
+  Serial.print("C ");
+  printDouble(imu.mag[0], 100);
+  Serial.print(" C ");
+  printDouble(imu.mag[1], 100);
+  Serial.print(" C ");
+  printDouble(imu.mag[2], 100);
+  Serial.println();
+
+  /*Serial.print("G ");
+  printDouble(imu.gyro[0], 100);
+  Serial.print(" G ");
+  printDouble(imu.gyro[1], 100);
+  Serial.print(" G ");
+  printDouble(imu.gyro[2], 100);
+  Serial.print(" H ");
+  Serial.println();*/
+
+  Serial.println();
 
   /*Serial.print(as0.analogReadSmooth(ir0));
   Serial.print(" ");
