@@ -76,17 +76,16 @@ void IMU::update() {
       mag[2] = imu.calcMag(imu.mz);
 
       imu.computeEulerAngles();
+
       pitch = imu.pitch;
       yaw = imu.yaw;
       roll = imu.roll;
 
+      imu.computeCompassHeading();
+      heading = imu.heading;
       
     }
     
   }
   
-}
-
-double IMU::read() {
-  return 0.0;
 }

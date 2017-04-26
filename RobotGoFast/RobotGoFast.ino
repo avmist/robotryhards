@@ -1,4 +1,4 @@
-#include <AnalogSmooth.h>
+//#include <AnalogSmooth.h>
 #include "Stepper.h"
 #include "Task.h"
 #include "RobotState.h"
@@ -277,13 +277,13 @@ unsigned long lastStatusPing = 0;
 void debug() {
 
   Serial.print("P ");
-  printDouble(imu.pitch);
+  printDouble(imu.pitch, 100);
   Serial.print(" Y ");
-  printDouble(imu.yaw);
+  printDouble(imu.yaw, 100);
   Serial.print(" R ");
-  printDouble(imu.roll);
+  printDouble(imu.roll, 100);
   Serial.print(" H ");
-  printDouble(imu.heading);
+  printDouble(imu.heading, 100);
 
   /*Serial.print(as0.analogReadSmooth(ir0));
   Serial.print(" ");
