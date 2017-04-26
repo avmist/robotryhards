@@ -3,7 +3,7 @@
 
 #include "Task.h"
 #include "Stepper.h"
-#include "PID_v1.h"
+#include "PID.h"
 
 extern Stepper leftMotor;
 extern Stepper rightMotor;
@@ -14,6 +14,8 @@ private:
 
   int deg;
   unsigned long steps;
+  PID pid;
+  double initialHeading;
 
 public:
 
