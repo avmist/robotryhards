@@ -58,12 +58,8 @@ bool GoTask::update() {
   double aveDistRight = (d2 + d3) / 2.0;
 
   // Calculate angle on left
-  double angleLeft = atan(abs(d0 - d1) / IR_SPACING);
+  double angleLeft = atan2(abs(d0 - d1), IR_SPACING);	//CHK: abs?
   angleLeft = angleLeft * 180.0 / PI;
-  
-  if(d0 > d1) {
-    angleLeft *= -1;
-  }
   
   Serial.print(" l-a ");
   printDouble(angleLeft, 100);
@@ -71,12 +67,8 @@ bool GoTask::update() {
   Serial.print(" ");
 
   // Calculate angle on right
-  double angleRight = atan(abs(d2 - d3) / IR_SPACING);
+  double angleRight = atan2(abs(d2 - d3), IR_SPACING);	//CHK: abs?
   angleRight = angleRight * 180.0 / PI;
-  
-  if(d2 > d3) {
-    angleRight *= -1;
-  }
   
   Serial.print(" r-a ");
   printDouble(angleRight, 100);
