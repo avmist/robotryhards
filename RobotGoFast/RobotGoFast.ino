@@ -11,6 +11,7 @@
 #include "GoTask.h"
 #include "HLTM.h"
 #include "math.h"
+#include "IMU.h"
 
 /* ST    P2    X  X  X  X  X  X
  *    X  X     X  X  X  X  X  X
@@ -142,9 +143,14 @@ Stepper leftMotor(1, 0, false);
 Stepper rightMotor(3, 2, true);
 
 LED led(13, 12, 11);
+
+IMU imu;
+
 HLTM hal(&square);
 
 void setup() {
+
+  Serial.begin(115200);
 
   analogWriteResolution(10);
 
@@ -153,8 +159,6 @@ void setup() {
   // Disable steppers initially
   digitalWrite(Stepper::enablePin, HIGH);
   
-  Serial.begin(9600);
-
   //ir0.addDatapoint(19, 12);
   //ir0.addDatapoint(22, 11.5);
   //ir0.addDatapoint(27, 11);
@@ -239,6 +243,8 @@ void setup() {
   ir3.addDatapoint(352, 3);
   ir3.addDatapoint(460, 2.5);
 
+  imu.init();
+
   //delay(2000);
 
   hal.init();  
@@ -251,14 +257,15 @@ void loop() {
 
   // Do HLTM
   hal.update();
+
+  // Do position update
+  imu.update();
   
   // Stepper update
   Stepper::updateAll();
 
   // LED Update
   LED::updateAll();
-
-  // Do position update
   
   // Do debug output
   debug();
@@ -268,6 +275,15 @@ void loop() {
 unsigned long lastStatusPing = 0;
 
 void debug() {
+
+  Serial.print("P ");
+  printDouble(imu.pitch);
+  Serial.print(" Y ");
+  printDouble(imu.yaw);
+  Serial.print(" R ");
+  printDouble(imu.roll);
+  Serial.print(" H ");
+  printDouble(imu.heading);
 
   /*Serial.print(as0.analogReadSmooth(ir0));
   Serial.print(" ");

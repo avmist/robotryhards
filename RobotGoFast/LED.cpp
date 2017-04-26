@@ -83,12 +83,25 @@ void LED::updateAll() {
 void LED::toggle(Color color) {
 
   if (on[color]) {
+    
     on[color] = false;
+    
     states[color] = LED::OFF;
+
     analogWrite(pins[color], 1023);
+    
   } else {
+    
     on[color] = true;
-    analogWrite(pins[color], 512);
+    
+    if(color == LED::RED) {
+      analogWrite(pins[color], 400);
+    } else if(color == LED::BLUE) {
+      analogWrite(pins[color], 300);
+    } else if(color == LED::GREEN) {
+      analogWrite(pins[color], 700);
+    }
+    
   }
   
 }
