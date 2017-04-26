@@ -277,11 +277,11 @@ unsigned long lastStatusPing = 0;
 void debug() {
 
   /*Serial.print("P ");
-  printDouble(imu.pitch, 100);*/
+  printDouble(imu.pitch, 100);
   Serial.print(" Y ");
   printDouble(imu.yaw, 100);
   /*Serial.print(" R ");
-  printDouble(imu.roll, 100);*/
+  printDouble(imu.roll, 100);
   Serial.print(" H ");
   printDouble(imu.heading, 100);
   Serial.println();

@@ -5,6 +5,7 @@
 #include "LinearFit.h"
 #include "RobotState.h"
 #include "LED.h"
+#include "Vec2.h"
 
 extern Stepper leftMotor;
 extern Stepper rightMotor;
