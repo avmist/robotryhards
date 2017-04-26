@@ -9,7 +9,7 @@ void IMU::init() {
   // Adapted from SparkFun IMU example code
   
   // Call imu.begin() to verify communication and initialize
-  if (imu.begin() != INV_SUCCESS) {
+  if(imu.begin() != INV_SUCCESS) {
     
     while(true) {
       Serial.println("Unable to communicate with MPU-9250");
@@ -24,7 +24,7 @@ void IMU::init() {
   imu.setSensors(INV_XYZ_GYRO | INV_XYZ_ACCEL | INV_XYZ_COMPASS);
 
   // Gyro options are +/- 250, 500, 1000, or 2000 dps
-  imu.setGyroFSR(250);
+  //imu.setGyroFSR(250);
 
   // Accel options are +/- 2, 4, 8, or 16 g
   imu.setAccelFSR(2);
@@ -32,7 +32,8 @@ void IMU::init() {
   // DMP_FEATURE_GYRO_CAL - Enable gyro cal
   // DMP_FEATURE_SEND_CAL_GYRO - Send cal'd gyro values
   // Set DMP rate to 10 Hz
-  imu.dmpBegin(DMP_FEATURE_GYRO_CAL | DMP_FEATURE_SEND_CAL_GYRO, 200);
+  //imu.dmpBegin(DMP_FEATURE_GYRO_CAL | DMP_FEATURE_SEND_CAL_GYRO, 200);
+  imu.dmpBegin(DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_GYRO_CAL | DMP_FEATURE_SEND_CAL_GYRO | DMP_FEATURE_6X_LP_QUAT, 200);
 
   // setLPF() can be used to set the digital low-pass filter
   // of the accelerometer and gyroscope.
@@ -41,12 +42,12 @@ void IMU::init() {
 
   // The sample rate of the accel/gyro can be set using
   // setSampleRate. Acceptable values range from 4Hz to 1kHz
-  imu.setSampleRate(1000);
+  //imu.setSampleRate(1000);
 
   // Likewise, the compass (magnetometer) sample rate can be
   // set using the setCompassSampleRate() function.
   // This value can range between: 1-100Hz
-  imu.setCompassSampleRate(100);
+  //imu.setCompassSampleRate(100);
   
 }
 
@@ -81,8 +82,7 @@ void IMU::update() {
       yaw = imu.yaw;
       roll = imu.roll;
 
-      imu.computeCompassHeading();
-      heading = imu.heading;
+      heading = imu.computeCompassHeading();
       
     }
     

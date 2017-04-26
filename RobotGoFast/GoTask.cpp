@@ -10,7 +10,7 @@ GoTask::GoTask(Task * mom, Task * dad, double distance, String name) : Task(GO, 
 
 bool GoTask::update() {
 
-  double d0 = ir0.read();
+  /*double d0 = ir0.read();
   if(d0 == LinearFit::TOO_FAR) {
     Serial.print(" FAR ");
   } else if(d0 == LinearFit::TOO_CLOSE) {
@@ -21,6 +21,7 @@ bool GoTask::update() {
   
   Serial.print(" ");
   
+  double d1 = ir1.read();
   if(d1 == LinearFit::TOO_FAR) {
     Serial.print(" FAR ");
   } else if(d1 == LinearFit::TOO_CLOSE) {
@@ -84,8 +85,8 @@ bool GoTask::update() {
     // Both sides against wall - best case for wall tracking
 
     if((micros() - lastStatusPing) > 500000) {
-      led.blink(LED::BLUE, 250000);
-      led.blink(LED::RED, 250000);
+      led.solid(LED::BLUE);
+      led.solid(LED::RED);
       lastStatusPing = micros();
       Serial.println("Both walls detected");
     }
@@ -95,7 +96,8 @@ bool GoTask::update() {
     // Left side against wall
     
     if((micros() - lastStatusPing) > 500000) {
-      led.blink(LED::BLUE, 250000);
+      led.solid(LED::BLUE);
+      led.off(LED::RED);
       lastStatusPing = micros();
       Serial.println("Left wall detected");
     }
@@ -105,12 +107,13 @@ bool GoTask::update() {
     // Right side against wall
 
     if((micros() - lastStatusPing) > 500000) {
-      led.blink(LED::RED, 250000);
+      led.solid(LED::RED);
+      led.off(LED::BLUE);
       lastStatusPing = micros();
       Serial.println("Right wall detected");
     }
     
-  }
+  }*/
 
   /*if(distance > 0) {
     leftMotor.set(20, Stepper::FORWARD);

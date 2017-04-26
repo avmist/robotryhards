@@ -1,10 +1,10 @@
 #include "TurnTask.h"
 
-TurnTask::TurnTask(Task * parent, double deg, String name) : Task(TURN, parent, name) {
+TurnTask::TurnTask(Task * parent, double deg, String name) : Task(TURN, parent, name), pid(1.0, 1.0, 1.0, 4.0, 4.0) {
   this->deg = deg;
 }
 
-TurnTask::TurnTask(Task * mom, Task * dad, double deg, String name) : Task(TURN, mom, dad, name) {
+TurnTask::TurnTask(Task * mom, Task * dad, double deg, String name) : Task(TURN, mom, dad, name), pid(1.0, 1.0, 1.0, 4.0, 4.0) {
   this->deg = deg;
 }
 
