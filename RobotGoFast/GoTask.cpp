@@ -55,24 +55,29 @@ bool GoTask::update() {
   
   Serial.print(" ");
 
-  double aveDistRight = (d2 + d3) / 2.0;
+  //double aveDistRight = (d2 + d3) / 2.0;	//TODO: find out what this does
+  //Calculate seen wall points
+  Vec2 i0 = Vec2(IR_SPACING / 2.0, d0);
+  Vec2 i1 = Vec2(-IR_SPACING / 2.0, d1);
+  Vec2 i2 = Vec2(-IR_SPACING / 2.0, -d2);
+  Vec2 i3 = Vec2(IR_SPACING / 2.0, -d3);
+  
+  //Calculate left boid
+  Vec2 leftDir = i0-i1;
+  Vec2 leftPos = Vec2.intersect(i1, leftDir, Vec2(0f, 0f), leftDir.left());
+  
+  // Calculate right boid
+  Vec2 rightDir = i3-i2;
+  Vec2 rightPos = Vec2.intersect(i2, rightDir, Vec2(0f, 0f), rightDir.right());
 
-  // Calculate angle on left
-  double angleLeft = atan2(abs(d0 - d1), IR_SPACING);	//CHK: abs?
-  angleLeft = angleLeft * 180.0 / PI;
-  
-  Serial.print(" l-a ");
-  printDouble(angleLeft, 100);
-  
-  Serial.print(" ");
+  //Calculate Intent
+  Vec2 intent = (rightPos.unit() * -leftPos.size() + leftPos.unit() * -rightPos.size()).unit();	//avoid
+  intent = intent + (leftDir * leftDir.size() + rightDir * rightDir.size()).unit();	//follow
+  float turnAmt = Vec2(1f, 0f).cross(intent.unit());
 
-  // Calculate angle on right
-  double angleRight = atan2(abs(d2 - d3), IR_SPACING);	//CHK: abs?
-  angleRight = angleRight * 180.0 / PI;
+  leftMotor.set(15 - turnAmt * 5, Stepper::FORWARD);
+  rightMotor.set(15 + turnAmt * 5, Stepper::FORWARD);
   
-  Serial.print(" r-a ");
-  printDouble(angleRight, 100);
-  Serial.println();
 
   if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR && d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
 
