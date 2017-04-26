@@ -33,12 +33,12 @@ void IMU::init() {
   // DMP_FEATURE_SEND_CAL_GYRO - Send cal'd gyro values
   // Set DMP rate to 10 Hz
   //imu.dmpBegin(DMP_FEATURE_GYRO_CAL | DMP_FEATURE_SEND_CAL_GYRO, 200);
-  imu.dmpBegin(DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_GYRO_CAL | DMP_FEATURE_SEND_CAL_GYRO | DMP_FEATURE_6X_LP_QUAT, 200);
+  imu.dmpBegin(DMP_FEATURE_SEND_RAW_ACCEL | DMP_FEATURE_SEND_RAW_GYRO | DMP_FEATURE_GYRO_CAL | DMP_FEATURE_SEND_CAL_GYRO | DMP_FEATURE_6X_LP_QUAT, 200);
 
   // setLPF() can be used to set the digital low-pass filter
   // of the accelerometer and gyroscope.
   // Can be any of the following: 188, 98, 42, 20, 10 or 5 Hz
-  imu.setLPF(5);
+  //imu.setLPF(5);
 
   // The sample rate of the accel/gyro can be set using
   // setSampleRate. Acceptable values range from 4Hz to 1kHz
