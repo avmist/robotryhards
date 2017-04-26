@@ -10,7 +10,7 @@ GoTask::GoTask(Task * mom, Task * dad, double distance, String name) : Task(GO, 
 
 bool GoTask::update() {
 
-  /*double d0 = ir0.read();
+  double d0 = ir0.read();
   if(d0 == LinearFit::TOO_FAR) {
     Serial.print(" FAR ");
   } else if(d0 == LinearFit::TOO_CLOSE) {
@@ -113,7 +113,7 @@ bool GoTask::update() {
       Serial.println("Right wall detected");
     }
     
-  }*/
+  }
 
   /*if(distance > 0) {
     leftMotor.set(20, Stepper::FORWARD);
