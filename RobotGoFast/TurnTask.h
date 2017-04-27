@@ -4,7 +4,9 @@
 #include "Task.h"
 #include "Stepper.h"
 #include "PID.h"
+#include "IMU.h"
 
+extern IMU imu;
 extern Stepper leftMotor;
 extern Stepper rightMotor;
 
@@ -12,20 +14,23 @@ class TurnTask : public Task {
 
 private:
 
-  int deg;
+  float deg;
   unsigned long steps;
   PID pid;
-  double initialHeading;
+  float initialYaw, finalYaw;
 
 public:
 
   // Constructors
-  TurnTask(Task * parent, double deg, String name);
-  TurnTask(Task * mom, Task * dad, double deg, String name);
+  TurnTask(Task * parent, float deg, String name);
+  TurnTask(Task * mom, Task * dad, float deg, String name);
 
   // Methods
   bool update() override;
   void init() override;
+
+  // Statics
+  static bool between(float value, float low, float high);
   
 };
 

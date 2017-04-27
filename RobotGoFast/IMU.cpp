@@ -38,7 +38,7 @@ void IMU::init() {
   // setLPF() can be used to set the digital low-pass filter
   // of the accelerometer and gyroscope.
   // Can be any of the following: 188, 98, 42, 20, 10 or 5 Hz
-  //imu.setLPF(5);
+  imu.setLPF(20);
 
   // The sample rate of the accel/gyro can be set using
   // setSampleRate. Acceptable values range from 4Hz to 1kHz
@@ -70,6 +70,8 @@ void IMU::update() {
       accel[0] = imu.calcAccel(imu.ax);
       accel[1] = imu.calcAccel(imu.ay);
       accel[2] = imu.calcAccel(imu.az);
+
+      imu.updateCompass();
 
       // Magnetometer
       mag[0] = imu.calcMag(imu.mx);
