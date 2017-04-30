@@ -12,9 +12,9 @@ void IMU::init() {
   if(imu.begin() != INV_SUCCESS) {
     
     while(true) {
-      Serial.println("Unable to communicate with MPU-9250");
-      Serial.println("Check connections, and try again.");
-      Serial.println();
+      SerialUSB.println("Unable to communicate with MPU-9250");
+      SerialUSB.println("Check connections, and try again.");
+      SerialUSB.println();
       delay(5000);
     }
     

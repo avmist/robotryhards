@@ -24,7 +24,7 @@ bool TurnTask::update() {
     speed = pid.Compute(angle, 0);
 
     // Turn right
-    Serial.println(" Right");
+    SerialUSB.println(" Right");
     leftMotor.set(abs(speed), Stepper::FORWARD);
     rightMotor.set(abs(speed), Stepper::BACKWARD);
 
@@ -33,17 +33,17 @@ bool TurnTask::update() {
     speed = pid.Compute(angle, 0);
 
     // Turn left
-    Serial.println(" Left");
+    SerialUSB.println(" Left");
     leftMotor.set(abs(speed), Stepper::BACKWARD);
     rightMotor.set(abs(speed), Stepper::FORWARD);
 
   }
 
-  Serial.print("Ang ");
+  SerialUSB.print("Ang ");
   printDouble(angle, 100);
-  Serial.print(" Spd ");
+  SerialUSB.print(" Spd ");
   printDouble(speed, 100);
-  //Serial.println();
+  //SerialUSB.println();
 
   if(abs(angle) < 1.0) {
     samples--;
@@ -72,7 +72,7 @@ bool TurnTask::update() {
     // Turn right
     speed = pid.Compute(steps, 0);
 
-    Serial.println("Right ");
+    SerialUSB.println("Right ");
     leftMotor.set(abs(speed), Stepper::FORWARD);
     rightMotor.set(abs(speed), Stepper::BACKWARD);
 
@@ -83,7 +83,7 @@ bool TurnTask::update() {
     speed = pid.Compute(steps, 0);
 
     // Turn left
-    Serial.println("Left ");
+    SerialUSB.println("Left ");
     leftMotor.set(abs(speed), Stepper::BACKWARD);
     rightMotor.set(abs(speed), Stepper::FORWARD);
 
@@ -91,11 +91,11 @@ bool TurnTask::update() {
 
   }
 
-  Serial.print("Steps ");
+  SerialUSB.print("Steps ");
   printDouble(steps, 100);
-  Serial.print(" Spd ");
+  SerialUSB.print(" Spd ");
   printDouble(speed, 100);
-  Serial.println();
+  SerialUSB.println();
 
   if(abs(steps) <= 5) {
     leftMotor.stop();
@@ -121,29 +121,29 @@ void TurnTask::init() {
   // Calculate distance to move
   double distnce = PI * Stepper::wheelSpacing * deg / 360.f;
 
-  Serial.print("Arc distance to travel: ");
-  Serial.print(distnce);
-  Serial.print(" in.\n");
+  SerialUSB.print("Arc distance to travel: ");
+  SerialUSB.print(distnce);
+  SerialUSB.print(" in.\n");
 
   // Calculate degree per step
   double degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
 
-  Serial.print("Deg per step: ");
-  Serial.print(degPerStep);
-  Serial.print(" deg.\n");
+  SerialUSB.print("Deg per step: ");
+  SerialUSB.print(degPerStep);
+  SerialUSB.print(" deg.\n");
 
   // Calculate distance per step
   double distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
 
-  Serial.print("Dist per step: ");
-  Serial.print(distPerStep);
-  Serial.print(" in.\n");
+  SerialUSB.print("Dist per step: ");
+  SerialUSB.print(distPerStep);
+  SerialUSB.print(" in.\n");
   
   steps = distnce / distPerStep;
   
-  Serial.print("Need to step: ");
-  Serial.print(steps);
-  Serial.print(" times.\n");
+  SerialUSB.print("Need to step: ");
+  SerialUSB.print(steps);
+  SerialUSB.print(" times.\n");
   
 }
 
