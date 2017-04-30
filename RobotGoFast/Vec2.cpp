@@ -5,6 +5,11 @@ Vec2::Vec2(double x, double y) {
 	this->y = y;
 }
 
+Vec2::Vec2() {
+	this->x = 1;
+	this->y = 0;
+}
+
 Vec2 Vec2::operator+ (Vec2 b) {
 	return Vec2(this->x + b.x, this->y + b.y);
 }
@@ -22,7 +27,16 @@ float Vec2::cross(Vec2 b) {
 }
 
 float Vec2::angleTo(Vec2 b) {
-	return acos(b.unit().dot(self.unit()));
+
+	//return acos(b.unit().dot(unit()));
+
+	// http://stackoverflow.com/questions/21483999/using-atan2-to-find-angle-between-two-vectors
+	// https://gamedev.stackexchange.com/questions/69649/using-atan2-to-calculate-angle-between-two-vectors
+	//return atan2(b.y, b.x) - atan2(y, x);
+
+	// Clockwise
+	// http://stackoverflow.com/questions/14066933/direct-way-of-computing-clockwise-angle-between-2-vectors
+	return atan2(x*b.y - y*b.x, x*b.x + y*b.y);
 }
 
 Vec2 Vec2::operator* (float c) {

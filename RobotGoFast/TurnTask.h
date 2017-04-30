@@ -5,6 +5,7 @@
 #include "Stepper.h"
 #include "PID.h"
 #include "IMU.h"
+#include "Vec2.h"
 
 extern IMU imu;
 extern Stepper leftMotor;
@@ -15,9 +16,11 @@ class TurnTask : public Task {
 private:
 
   float deg;
-  unsigned long steps;
+  long steps;
   PID pid;
-  float initialYaw, finalYaw;
+  Vec2 initialVec, finalVec;
+  int samples = 50;
+  bool direction = true;
 
 public:
 

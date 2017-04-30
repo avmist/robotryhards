@@ -41,7 +41,7 @@ public:
   // Methods
   void set(double speed, Direction direction);
   void stop();
-  unsigned long getCount();
+  long getCount();
   void resetCount();
 
   // Statics

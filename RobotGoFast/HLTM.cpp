@@ -12,7 +12,7 @@ void HLTM::update() {
 
   //Serial.print("Boop\n");
 
-  if(currentTask == nullptr) {
+  if(!currentTask) {
     
     Serial.print("Task is NULL\n");
     state = ERROR;

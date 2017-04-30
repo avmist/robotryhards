@@ -655,18 +655,22 @@ void MPU9250_DMP::computeEulerAngles(bool degrees)
 
 float MPU9250_DMP::computeCompassHeading(void)
 {
-	if (my == 0)
-		heading = (mx < 0) ? 180.0 : 0;
-	else
-		heading = atan2(mx, my);
+	heading = atan2(calcMag(mx), calcMag(my));
 	
-	if (heading > PI) heading -= (2 * PI);
-	else if (heading < -PI) heading += (2 * PI);
-	else if (heading < 0) heading += 2 * PI;
+	if(heading > 2 * PI) {
+
+		heading -= (2 * PI);
+
+	} else if(heading < 0.0) {
+
+		heading += (2 * PI);
+
+	}
 	
-	heading*= 180.0 / PI;
+	heading *= 180.0 / PI;
 	
 	return heading;
+
 }
 
 unsigned short MPU9250_DMP::orientation_row_2_scale(const signed char *row)

@@ -2,6 +2,7 @@
 #define VEC2_H
 
 #include "math.h"
+#include "Arduino.h"
 
 class Vec2 {
 
@@ -11,13 +12,14 @@ public:
 
   // Constructors
   Vec2(double x, double y);
+  Vec2();
 
   // Methods
   Vec2 operator+ (Vec2 b);	//add 2 vectors
   Vec2 operator- (Vec2 b);	//subtract 2 vectors, (vector from b to this)
   float dot(Vec2 b);		//dot product
   float cross(Vec2 b);		//2D cross product (area of a paralellogram formed by the two vectors)
-  float angleTo(vec2 b);	//angle from this to the given b
+  float angleTo(Vec2 b);	//angle from this to the given b
   
   Vec2 operator* (float c);	//scale by c
   Vec2 operator/ (float c);	//scale by 1/c

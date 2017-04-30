@@ -67,6 +67,7 @@ void Stepper::update() {
       delayMicroseconds(2);
       digitalWrite(stepPin, LOW);
       delayMicroseconds(2);
+
       stepCount++;
       
     }
@@ -122,10 +123,12 @@ void Stepper::stop() {
   this->delay = 0;
 }
 
-unsigned long Stepper::getCount() {
-  return this->stepCount;
+long Stepper::getCount() {
+  long count = stepCount;
+  resetCount();
+  return count;
 }
 
 void Stepper::resetCount() {
-  this->stepCount = 0;
+  stepCount = 0;
 }
