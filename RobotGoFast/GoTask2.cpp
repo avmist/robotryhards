@@ -10,7 +10,7 @@ GoTask2::GoTask2(Task * mom, Task * dad, float distance, String name) : Task(GO,
 
 void GoTask2::initPID() {
   distPD = PID(0.05, 0.0, 0.15, -6.0, 6.0);
-  angPD = PID(0.5, 0.0, 1.0, -6.0, 6.0);
+  angPD = PID(0.2, 0.0, 0.1, -6.0, 6.0);
 }
 
 bool GoTask2::update() {
@@ -81,28 +81,28 @@ bool GoTask2::update() {
     float targetAngle = overallAngle / 2.0;
     float angError = targetAngle - angleLeft;
 
-    // SerialUSB.print("Ang Error: ");
-    // printDouble(angError, 10);
-    // SerialUSB.println();
+    SerialUSB.print("Ang Error: ");
+    printDouble(angError, 10);
+    SerialUSB.println();
 
     float diff = angPD.Compute(angleLeft, targetAngle);
 
-    // SerialUSB.print("Diff: ");
-    // printDouble(diff, 10);
-    // SerialUSB.println();
+    SerialUSB.print("Diff: ");
+    printDouble(diff, 10);
+    SerialUSB.println();
 
-    leftMotor.set(15 - diff, Stepper::FORWARD);
-    rightMotor.set(15 + diff, Stepper::FORWARD);
+    leftMotor.set(6 - diff, Stepper::FORWARD);
+    rightMotor.set(6 + diff, Stepper::FORWARD);
 
-    // printDouble(15 - diff, 100);
-    // SerialUSB.print(" ");
-    // printDouble(15 + diff, 100);
-    // SerialUSB.println();
+    printDouble(6 - diff, 100);
+    SerialUSB.print(" ");
+    printDouble(6 + diff, 100);
+    SerialUSB.println();
 
-    // // leftMotor.set(0, Stepper::FORWARD);
-    // // rightMotor.set(0, Stepper::FORWARD);
+    // leftMotor.set(0, Stepper::FORWARD);
+    // rightMotor.set(0, Stepper::FORWARD);
 
-    // SerialUSB.println();
+    SerialUSB.println();
 
     // if(angleLeft >= 0.0 && angleRight >= 0.0) {
 
@@ -158,7 +158,7 @@ bool GoTask2::update() {
 
     // Serial update
     if(state != LEFT_WALL) {
-      SerialUSB.println("LEFT");
+      //SerialUSB.println("LEFT");
       state = LEFT_WALL;
     }
     
@@ -178,7 +178,7 @@ bool GoTask2::update() {
 
     // Serial update
     if(state != RIGHT_WALL) {
-      SerialUSB.println("RIGHT");
+      //SerialUSB.println("RIGHT");
       state = RIGHT_WALL;
     }
 
@@ -193,7 +193,7 @@ bool GoTask2::update() {
 
     // Serial update
     if(state != NO_WALL) {
-      SerialUSB.println("NO WALL");
+      //SerialUSB.println("NO WALL");
       state = NO_WALL;
     }
 

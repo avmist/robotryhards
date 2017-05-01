@@ -134,7 +134,7 @@ StopTask square13(&square12, "End");
 
 // Go test
 StartTask go(NULL, "Start");
-GoTask go1(&go, 24, "Go 24 in");
+GoTask2 go1(&go, 24, "Go 24 in");
 StopTask go2(&go1, "End");
 
 enum RobotState state = IDLE;
@@ -323,29 +323,29 @@ void debug() {
   //SerialUSB.println("<3");
 
   /*SerialUSB.print("P ");
-  printDouble(imu.pitch, 100);
+  printfloat(imu.pitch, 100);
   SerialUSB.print(" Y ");
-  printDouble(imu.yaw, 100);
+  printfloat(imu.yaw, 100);
   SerialUSB.print(" R ");
-  printDouble(imu.roll, 100);*/
+  printfloat(imu.roll, 100);*/
   // SerialUSB.print(" H ");
-  // printDouble(imu.heading, 100);
+  // printfloat(imu.heading, 100);
   // //SerialUSB.println();
 
   // SerialUSB.print(" C ");
-  // printDouble(imu.mag[0], 100);
+  // printfloat(imu.mag[0], 100);
   // SerialUSB.print(" C ");
-  // printDouble(imu.mag[1], 100);
+  // printfloat(imu.mag[1], 100);
   // SerialUSB.print(" C ");
-  // printDouble(imu.mag[2], 100);
+  // printfloat(imu.mag[2], 100);
   // SerialUSB.println();
 
   /*SerialUSB.print("G ");
-  printDouble(imu.gyro[0], 100);
+  printfloat(imu.gyro[0], 100);
   SerialUSB.print(" G ");
-  printDouble(imu.gyro[1], 100);
+  printfloat(imu.gyro[1], 100);
   SerialUSB.print(" G ");
-  printDouble(imu.gyro[2], 100);
+  printfloat(imu.gyro[2], 100);
   SerialUSB.println();
 
   SerialUSB.println();*/
