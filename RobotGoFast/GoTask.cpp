@@ -79,7 +79,7 @@ bool GoTask::update() {
   leftMotor.set(15 + turnAmt * 5, Stepper::FORWARD);
   rightMotor.set(15 - turnAmt * 5, Stepper::FORWARD);
 
-  printDouble(turnAmt, 10);	// how fucked is turnAmt?
+  printDouble(intent.y, 10);	// how fucked is turnAmt?
   SerialUSB.println();
 
   if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR && d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
