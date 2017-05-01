@@ -17,7 +17,7 @@ bool TurnTask::update() {
   float angle = currentVec.angleTo(finalVec);
   angle *= 180.f / PI;
 
-  double speed;
+  float speed;
 
   if(angle > 0) {
 
@@ -59,7 +59,7 @@ bool TurnTask::update() {
 
   // Start per steps code
 
-  double speed;
+  float speed;
 
   if(direction) {
     steps -= leftMotor.getCount() + rightMotor.getCount() / 2;
@@ -119,21 +119,21 @@ void TurnTask::init() {
   finalVec = Vec2::fromPolarDeg(1.0, fmod(imu.yaw + deg, 360));
 
   // Calculate distance to move
-  double distnce = PI * Stepper::wheelSpacing * deg / 360.f;
+  float distnce = PI * Stepper::wheelSpacing * deg / 360.f;
 
   SerialUSB.print("Arc distance to travel: ");
   SerialUSB.print(distnce);
   SerialUSB.print(" in.\n");
 
   // Calculate degree per step
-  double degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
+  float degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
 
   SerialUSB.print("Deg per step: ");
   SerialUSB.print(degPerStep);
   SerialUSB.print(" deg.\n");
 
   // Calculate distance per step
-  double distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
+  float distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
 
   SerialUSB.print("Dist per step: ");
   SerialUSB.print(distPerStep);

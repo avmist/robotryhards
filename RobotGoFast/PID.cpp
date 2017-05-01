@@ -16,7 +16,7 @@
 
 #include "PID.h"
 
-PID::PID(double Kp, double Ki, double Kd, double min, double max) {
+PID::PID(float Kp, float Ki, float Kd, float min, float max) {
 	
   outMin = min;
   outMax = max;
@@ -27,28 +27,30 @@ PID::PID(double Kp, double Ki, double Kd, double min, double max) {
 
   lastTime = millis();
 
-  //double SampleTimeInSec = ((double) SampleTime) / 1000;  
+  //float SampleTimeInSec = ((float) SampleTime) / 1000;  
   //kp = Kp;
   //ki = Ki * SampleTimeInSec;
   //kd = Kd / SampleTimeInSec;
 
 }
 
-double PID::Compute(double input, double setpoint) {
+PID::PID() {}
+
+float PID::Compute(float input, float setpoint) {
 
   const unsigned long t = millis();
 
-  const double dT = (t - lastTime) / 1000000.f; // In seconds
+  const float dT = (t - lastTime) / 1000000.f; // In seconds
 
-  const double error = setpoint - input;
+  const float error = setpoint - input;
 
   errorSum += (error * dT);
 
-  const double dInput = (input - lastInput);
+  const float dInput = (input - lastInput);
 
-  //const double dErr = (error - lastErr) / dT;
+  //const float dErr = (error - lastErr) / dT;
 
-  const double output = (kp * error) + (ki * errorSum) - (kd * dInput);
+  const float output = (kp * error) + (ki * errorSum) - (kd * dInput);
 
   lastInput = input;
   lastError = error;

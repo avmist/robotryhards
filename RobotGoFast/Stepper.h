@@ -10,10 +10,10 @@ public:
   enum Direction { FORWARD, BACKWARD };
 
   static const int enablePin;
-  static const double stepsPerRevolution;
-  static const double microsteps;
-  static const double wheelDiameter; // In inches
-  static const double wheelSpacing; // In inches
+  static const float stepsPerRevolution;
+  static const float microsteps;
+  static const float wheelDiameter; // In inches
+  static const float wheelSpacing; // In inches
   static const unsigned long maxSpeed;
   
 private:
@@ -24,7 +24,7 @@ private:
   unsigned long lastUpdateTime; // In uS
   unsigned long stepCount; // In microsteps
   unsigned long delay; // In uS
-  double speed; // In Inches / Second
+  float speed; // In Inches / Second
   
   Direction direction;
   
@@ -39,7 +39,7 @@ public:
   Stepper(int stepPin, int dirPin, bool reversed);
 
   // Methods
-  void set(double speed, Direction direction);
+  void set(float speed, Direction direction);
   void stop();
   long getCount();
   void resetCount();

@@ -28,8 +28,8 @@ private:
 public:
 
   // Constructors
-  GoTask(Task * parent, double distance, String name);
-  GoTask(Task * mom, Task * dad, double distance, String name);
+  GoTask(Task * parent, float distance, String name);
+  GoTask(Task * mom, Task * dad, float distance, String name);
 
   // Methods
   bool update() override;

@@ -10,13 +10,13 @@ class LinearFit {
 
 public:
 
-  const static double TOO_CLOSE;
-  const static double TOO_FAR;
+  const static float TOO_CLOSE;
+  const static float TOO_FAR;
 
 private:
 
-  double x[20];
-  double y[20];
+  float x[20];
+  float y[20];
   int numDatapoints;
   const int pin;
   
@@ -26,12 +26,12 @@ public:
   LinearFit(int pin);
   
   // Statics
-  static double lerp(double x, double x0, double y0, double x1, double y1);
+  static float lerp(float x, float x0, float y0, float x1, float y1);
 
   // Methods
-  void addDatapoint(double x, double y);    // Needs to be monotonic on x
+  void addDatapoint(float x, float y);    // Needs to be monotonic on x
                                             // Two points minimum
-  double read();
+  float read();
 
 private:
   

@@ -5,7 +5,7 @@
 
 enum RobotState { IDLE, RUNNING, ERROR, COMPLETE };
 
-const double IR_SPACING = 4.6625;
+const float IR_SPACING = 4.6625;
 
 void printDouble(float val, unsigned int precision);
 

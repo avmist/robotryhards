@@ -1,16 +1,16 @@
 #include "GoTask.h"
 
-GoTask::GoTask(Task * parent, double distance, String name) : Task(GO, parent, name) {
+GoTask::GoTask(Task * parent, float distance, String name) : Task(GO, parent, name) {
   this->distance = distance;
 }
 
-GoTask::GoTask(Task * mom, Task * dad, double distance, String name) : Task(GO, mom, dad, name) {
+GoTask::GoTask(Task * mom, Task * dad, float distance, String name) : Task(GO, mom, dad, name) {
   this->distance = distance;
 }
 
 bool GoTask::update() {
 
-  double d0 = ir0.read();
+  float d0 = ir0.read();
   /*if(d0 == LinearFit::TOO_FAR) {
     SerialUSB.print(" FAR ");
   } else if(d0 == LinearFit::TOO_CLOSE) {
@@ -21,7 +21,7 @@ bool GoTask::update() {
   
   //SerialUSB.print(" ");
   
-  double d1 = ir1.read();
+  float d1 = ir1.read();
   /*if(d1 == LinearFit::TOO_FAR) {
     SerialUSB.print(" FAR ");
   } else if(d1 == LinearFit::TOO_CLOSE) {
@@ -32,9 +32,9 @@ bool GoTask::update() {
   
   //SerialUSB.print(" ");
 
-  double aveDistLeft = (d0 + d1) / 2.0;
+  float aveDistLeft = (d0 + d1) / 2.0;
   
-  double d2 = ir2.read();
+  float d2 = ir2.read();
   /*if(d2 == LinearFit::TOO_FAR) {
     SerialUSB.print(" FAR ");
   } else if(d2 == LinearFit::TOO_CLOSE) {
@@ -45,7 +45,7 @@ bool GoTask::update() {
   
   //SerialUSB.print(" ");
   
-  double d3 = ir3.read();
+  float d3 = ir3.read();
   /*if(d3 == LinearFit::TOO_FAR) {
     SerialUSB.print(" FAR ");
   } else if(d3 == LinearFit::TOO_CLOSE) {
@@ -56,7 +56,7 @@ bool GoTask::update() {
   
   //SerialUSB.print(" ");
 
-  //double aveDistRight = (d2 + d3) / 2.0;	//TODO: find out what this does
+  //float aveDistRight = (d2 + d3) / 2.0;	//TODO: find out what this does
   //Calculate seen wall points
   Vec2 i0 = Vec2(IR_SPACING / 2.0, d0);
   Vec2 i1 = Vec2(-IR_SPACING / 2.0, d1);
@@ -147,14 +147,14 @@ void GoTask::init() {
   SerialUSB.print(" in.\n");
 
   // Calculate degree per step
-  double degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
+  float degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
 
   SerialUSB.print("Deg per step: ");
   SerialUSB.print(degPerStep);
   SerialUSB.print(" deg.\n");
 
   // Calculate distance per step
-  double distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
+  float distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
 
   SerialUSB.print("Dist per step: ");
   SerialUSB.print(distPerStep);

@@ -8,6 +8,7 @@
 #include "StartTask.h"
 #include "StopTask.h"
 #include "GoTask.h"
+#include "GoTask2.h"
 #include "HLTM.h"
 #include "math.h"
 #include "IMU.h"

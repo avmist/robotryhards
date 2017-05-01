@@ -4,10 +4,10 @@
 Stepper * Stepper::steppers[2];
 bool Stepper::enabled = false;
 const int Stepper::enablePin = 4;
-const double Stepper::stepsPerRevolution = 200;
-const double Stepper::microsteps = 8;
-const double Stepper::wheelDiameter = 2.786; // In Inches
- const double Stepper::wheelSpacing = 4.491; // In inches
+const float Stepper::stepsPerRevolution = 200;
+const float Stepper::microsteps = 8;
+const float Stepper::wheelDiameter = 2.786; // In Inches
+ const float Stepper::wheelSpacing = 4.491; // In inches
 const unsigned long Stepper::maxSpeed = 21; // Inches / Second
 
 // Constructors
@@ -78,7 +78,7 @@ void Stepper::update() {
   
 }
 
-void Stepper::set(double speed, Direction direction) {
+void Stepper::set(float speed, Direction direction) {
 
   this->speed = fmin(speed, maxSpeed);
   this->direction = direction;
@@ -104,18 +104,18 @@ void Stepper::set(double speed, Direction direction) {
   // Calculate step delay
 
   // Calculate speed as an RPM
-  double rpm = 60 * this->speed / (PI * wheelDiameter);
+  float rpm = 60 * this->speed / (PI * wheelDiameter);
   //printDouble(rpm, 100000);
   
-  double stepsPerMinute = rpm * stepsPerRevolution * microsteps;
+  float stepsPerMinute = rpm * stepsPerRevolution * microsteps;
   //printDouble(stepsPerMinute, 100000);
   
-  double secondsPerStep = 60.0f / stepsPerMinute;
+  float secondsPerStep = 60.0f / stepsPerMinute;
   //printDouble(secondsPerStep, 100000);
   
   this->delay = secondsPerStep * 1000000.0f;
   
-  //printDouble(this->delay, 100000);
+  //SerialUSB.println((int) this->delay);
   
 }
 

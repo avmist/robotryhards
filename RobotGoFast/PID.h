@@ -23,20 +23,21 @@ class PID {
 
   public:
 
-    PID(double Kp, double Ki, double Kd, double min, double max);
+    PID(float Kp, float Ki, float Kd, float min, float max);
+    PID();
 	
-    double Compute(double input, double setpoint);
+    float Compute(float input, float setpoint);
 
   private:
 
-	double kp;                  // * (P)roportional Tuning Parameter
-    double ki;                  // * (I)ntegral Tuning Parameter
-    double kd;                  // * (D)erivative Tuning Parameter
+	float kp;                  // * (P)roportional Tuning Parameter
+    float ki;                  // * (I)ntegral Tuning Parameter
+    float kd;                  // * (D)erivative Tuning Parameter
 
 	unsigned long lastTime;
-	double errorSum, lastInput, lastError;
+	float errorSum, lastInput, lastError;
 
-	double outMin, outMax;
+	float outMin, outMax;
 
 };
 
