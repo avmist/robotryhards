@@ -65,14 +65,14 @@ bool GoTask::update() {
   
   //Calculate left boid
   Vec2 leftDir = i0 - i1;
-  Vec2 leftPos = Vec2::intersect(i1, leftDir, Vec2(), leftDir.left());
+  Vec2 leftPos = Vec2::intersect(i1, leftDir, Vec2(0.f, 0.f), leftDir.left());
   
   // Calculate right boid
   Vec2 rightDir = i3 - i2;
-  Vec2 rightPos = Vec2::intersect(i2, rightDir, Vec2(), rightDir.right());
+  Vec2 rightPos = Vec2::intersect(i2, rightDir, Vec2(0.f, 0.f), rightDir.right());
 
   //Calculate Intent
-  Vec2 intent = (rightPos.unit() * -leftPos.size() + leftPos.unit() * -rightPos.size()).unit();	//avoid
+  Vec2 intent = (rightPos.unit() * -leftPos.size() - leftPos.unit() * -rightPos.size()).unit();	//avoid
   intent = intent + (leftDir * rightPos.size() + rightDir * leftPos.size()).unit();	//follow
   float turnAmt = Vec2(1.f, 0.f).cross(intent.unit());
 
