@@ -91,12 +91,12 @@ bool GoTask2::update() {
     printDouble(diff, 10);
     SerialUSB.println();
 
-    leftMotor.set(6 - diff, Stepper::FORWARD);
-    rightMotor.set(6 + diff, Stepper::FORWARD);
+    leftMotor.set(6 + diff, Stepper::FORWARD);
+    rightMotor.set(6 - diff, Stepper::FORWARD);
 
-    printDouble(6 - diff, 100);
-    SerialUSB.print(" ");
     printDouble(6 + diff, 100);
+    SerialUSB.print(" jrlkwjr ");
+    printDouble(6 - diff, 100);
     SerialUSB.println();
 
     // leftMotor.set(0, Stepper::FORWARD);
