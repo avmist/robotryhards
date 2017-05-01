@@ -73,13 +73,20 @@ bool GoTask::update() {
 
   //Calculate Intent
   Vec2 intent = (rightPos.unit() * -leftPos.size() + leftPos.unit() * -rightPos.size()).unit();	//avoid
+  SerialUSB.print("Avoid: ");
+  printDouble(intent.x, 10);
+  SerialUSB.print(",   ");
+  printDouble(intent.y, 10);
   intent = intent + (leftDir * rightPos.size() + rightDir * leftPos.size()).unit();	//follow
+  SerialUSB.print("Follow: ");
+  printDouble(intent.unit().x, 10);
+  SerialUSB.print(",   ");
+  printDouble(intent.unit().y, 10);
   float turnAmt = Vec2(1.f, 0.f).cross(intent.unit());
 
   leftMotor.set(15 + turnAmt * 5, Stepper::FORWARD);
   rightMotor.set(15 - turnAmt * 5, Stepper::FORWARD);
 
-  printDouble(intent.unit().y, 10);	// how fucked is turnAmt?
   SerialUSB.println();
 
   if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR && d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
