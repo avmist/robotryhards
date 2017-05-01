@@ -64,20 +64,20 @@ bool GoTask::update() {
   Vec2 i3 = Vec2(IR_SPACING / 2.0, -d3);
   
   //Calculate left boid
-  Vec2 leftDir = i0-i1;
-  Vec2 leftPos = Vec2::intersect(i1, leftDir, Vec2(0.f, 0.f), leftDir.left());
+  Vec2 leftDir = i0 - i1;
+  Vec2 leftPos = Vec2::intersect(i1, leftDir, Vec2(), leftDir.left());
   
   // Calculate right boid
-  Vec2 rightDir = i3-i2;
-  Vec2 rightPos = Vec2::intersect(i2, rightDir, Vec2(0.f, 0.f), rightDir.right());
+  Vec2 rightDir = i3 - i2;
+  Vec2 rightPos = Vec2::intersect(i2, rightDir, Vec2(), rightDir.right());
 
   //Calculate Intent
   Vec2 intent = (rightPos.unit() * -leftPos.size() + leftPos.unit() * -rightPos.size()).unit();	//avoid
   intent = intent + (leftDir * rightPos.size() + rightDir * leftPos.size()).unit();	//follow
   float turnAmt = Vec2(1.f, 0.f).cross(intent.unit());
 
-  leftMotor.set(15 + turnAmt * 6, Stepper::FORWARD);
-  rightMotor.set(15 - turnAmt * 6, Stepper::FORWARD);
+  leftMotor.set(15 + turnAmt * 5, Stepper::FORWARD);
+  rightMotor.set(15 - turnAmt * 5, Stepper::FORWARD);
 
   printDouble(turnAmt, 10);	// how fucked is turnAmt?
   SerialUSB.println();
