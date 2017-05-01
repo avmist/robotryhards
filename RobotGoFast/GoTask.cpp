@@ -72,14 +72,14 @@ bool GoTask::update() {
   Vec2 rightPos = Vec2::intersect(i2, rightDir, Vec2(0.f, 0.f), rightDir.right());
 
   //Calculate Intent
-  Vec2 intent = (rightPos.unit() * -leftPos.size() - leftPos.unit() * -rightPos.size()).unit();	//avoid
+  Vec2 intent = (rightPos.unit() * -leftPos.size() + leftPos.unit() * -rightPos.size()).unit();	//avoid
   intent = intent + (leftDir * rightPos.size() + rightDir * leftPos.size()).unit();	//follow
   float turnAmt = Vec2(1.f, 0.f).cross(intent.unit());
 
   leftMotor.set(15 + turnAmt * 5, Stepper::FORWARD);
   rightMotor.set(15 - turnAmt * 5, Stepper::FORWARD);
 
-  printDouble(intent.y, 10);	// how fucked is turnAmt?
+  printDouble(intent.unit().y, 10);	// how fucked is turnAmt?
   SerialUSB.println();
 
   if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR && d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
