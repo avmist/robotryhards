@@ -10,53 +10,6 @@ TurnTask::TurnTask(Task * mom, Task * dad, float deg, String name) : Task(TURN, 
 
 bool TurnTask::update() {
 
-  // Start per gyro code
-
-  /*Vec2 currentVec = Vec2::fromPolarDeg(1.0, imu.yaw);
-
-  float angle = currentVec.angleTo(finalVec);
-  angle *= 180.f / PI;
-
-  float speed;
-
-  if(angle > 0) {
-
-    speed = pid.Compute(angle, 0);
-
-    // Turn right
-    SerialUSB.println(" Right");
-    leftMotor.set(abs(speed), Stepper::FORWARD);
-    rightMotor.set(abs(speed), Stepper::BACKWARD);
-
-  } else {
-
-    speed = pid.Compute(angle, 0);
-
-    // Turn left
-    SerialUSB.println(" Left");
-    leftMotor.set(abs(speed), Stepper::BACKWARD);
-    rightMotor.set(abs(speed), Stepper::FORWARD);
-
-  }
-
-  SerialUSB.print("Ang ");
-  printDouble(angle, 100);
-  SerialUSB.print(" Spd ");
-  printDouble(speed, 100);
-  //SerialUSB.println();
-
-  if(abs(angle) < 1.0) {
-    samples--;
-  }
-
-  if(samples <= 0) {
-    leftMotor.stop();
-    rightMotor.stop();
-    return true;
-  }
-  
-  return false;*/
-
   // Start per steps code
 
   float speed;
@@ -136,6 +89,7 @@ void TurnTask::init() {
   SerialUSB.print(" in.\n");
   
   steps = distnce / distPerStep;
+  steps *= 1.1;
   
   SerialUSB.print("Need to step: ");
   SerialUSB.print(steps);

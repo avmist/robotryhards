@@ -52,6 +52,7 @@ public:
 private:
 
   void update();
+  void setLow();
 
 };
 

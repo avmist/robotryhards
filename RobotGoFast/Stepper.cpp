@@ -7,7 +7,7 @@ const int Stepper::enablePin = 4;
 const float Stepper::stepsPerRevolution = 200;
 const float Stepper::microsteps = 8;
 const float Stepper::wheelDiameter = 2.786; // In Inches
- const float Stepper::wheelSpacing = 4.491; // In inches
+const float Stepper::wheelSpacing = 4.491; // In inches
 const unsigned long Stepper::maxSpeed = 21; // Inches / Second
 
 // Constructors
@@ -47,7 +47,16 @@ void Stepper::updateAll() {
 
   steppers[0]->update();
   steppers[1]->update();
+
+  delayMicroseconds(2);
+
+  steppers[0]->setLow();
+  steppers[1]->setLow();
   
+}
+
+void Stepper::setLow() {
+  digitalWrite(stepPin, LOW);
 }
 
 // Methods
@@ -64,9 +73,6 @@ void Stepper::update() {
 
       // Don't step if the speed is set to zero, just reset the lastUpdateTime
       digitalWrite(stepPin, HIGH);
-      delayMicroseconds(2);
-      digitalWrite(stepPin, LOW);
-      delayMicroseconds(2);
 
       stepCount++;
       

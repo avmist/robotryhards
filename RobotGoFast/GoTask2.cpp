@@ -9,73 +9,35 @@ GoTask2::GoTask2(Task * mom, Task * dad, float distance, String name) : Task(GO,
 }
 
 void GoTask2::initPID() {
-  distPD = PID(0.05, 0.0, 0.15, -6.0, 6.0);
-  angPD = PID(0.2, 0.0, 0.1, -6.0, 6.0);
+  distPD = PID(0.8, 0.0, 0.4, -6.0, 6.0);
+  angPD = PID(0.4, 0.0, 0.2, -4.0, 4.0);
 }
 
 bool GoTask2::update() {
 
-  float d0 = ir0.read();
-  /*if(d0 == LinearFit::TOO_FAR) {
-    SerialUSB.print(" FAR ");
-  } else if(d0 == LinearFit::TOO_CLOSE) {
-    SerialUSB.print("CLOSE");
-  } else {
-    printDouble(d0, 100);
-  }*/
-  
-  //SerialUSB.print(" ");
-  
+  float d0 = ir0.read();  
   float d1 = ir1.read();
-  /*if(d1 == LinearFit::TOO_FAR) {
-    SerialUSB.print(" FAR ");
-  } else if(d1 == LinearFit::TOO_CLOSE) {
-    SerialUSB.print("CLOSE");
-  } else {
-    printDouble(d1, 100);
-  }*/
-  
-  //SerialUSB.print(" ");
-
   float aveDistLeft = (d0 + d1) / 2.0;
   
   float d2 = ir2.read();
-  /*if(d2 == LinearFit::TOO_FAR) {
-    SerialUSB.print(" FAR ");
-  } else if(d2 == LinearFit::TOO_CLOSE) {
-    SerialUSB.print("CLOSE");
-  } else {
-    printDouble(d2, 100);
-  }*/
-  
-  //SerialUSB.print(" ");
-  
   float d3 = ir3.read();
-  /*if(d3 == LinearFit::TOO_FAR) {
-    SerialUSB.print(" FAR ");
-  } else if(d3 == LinearFit::TOO_CLOSE) {
-    SerialUSB.print("CLOSE");
-  } else {
-    printDouble(d3, 100);
-  }*/
-  
-  //SerialUSB.print(" ");
-
   float aveDistRight = (d2 + d3) / 2.0;
 
-  float distError, angError;
+  float angleLeft = atan2(d0 - d1, IR_SPACING);
+  angleLeft = angleLeft * 180.0 / PI;
 
-  if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR && d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
+  float angleRight = atan2(d2 - d3, IR_SPACING);
+  angleRight = angleRight * 180.0 / PI;
+
+  if(d0 < 8.0 && d1 < 8.0 && d2 < 8.0 && d3 < 8.0) {
 
     // Both sides against wall - best case for wall tracking
 
-    float distError = aveDistRight - aveDistLeft;
-
-    float angleLeft = atan2(d0 - d1, IR_SPACING);
-    angleLeft = angleLeft * 180.0 / PI;
-
-    float angleRight = atan2(d2 - d3, IR_SPACING);
-    angleRight = angleRight * 180.0 / PI;
+    // SerialUSB update
+    if(state != BOTH_WALLS) {
+      SerialUSB.println("BOTH");
+      state = BOTH_WALLS;
+    }
 
     float overallAngle = angleRight + angleLeft;
     float targetAngle = overallAngle / 2.0;
@@ -85,62 +47,31 @@ bool GoTask2::update() {
     printDouble(angError, 10);
     SerialUSB.println();
 
-    float diff = angPD.Compute(angleLeft, targetAngle);
+    float distError = aveDistLeft - aveDistRight;
 
-    SerialUSB.print("Diff: ");
-    printDouble(diff, 10);
+    float distDiff = distPD.Compute(distError, 0.0);
+    float angDiff = angPD.Compute(angleLeft, targetAngle);
+
+    SerialUSB.print("Ang diff: ");
+    printDouble(angDiff, 10);
     SerialUSB.println();
 
-    leftMotor.set(6 - diff, Stepper::FORWARD);
-    rightMotor.set(6 + diff, Stepper::FORWARD);
+    SerialUSB.print("Dist diff: ");
+    printDouble(distDiff, 10);
+    SerialUSB.println();
 
-    printDouble(6 - diff, 100);
+    leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
+    rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
+
+    printDouble(8 + (angDiff + distDiff), 100);
     SerialUSB.print(" ");
-    printDouble(6 + diff, 100);
+    printDouble(8 - (angDiff + distDiff), 100);
     SerialUSB.println();
 
     // leftMotor.set(0, Stepper::FORWARD);
     // rightMotor.set(0, Stepper::FORWARD);
 
     SerialUSB.println();
-
-    // if(angleLeft >= 0.0 && angleRight >= 0.0) {
-
-    //   // Best case, both walls are angling outwards relative to us
-
-    //   // Simply match the angles;
-
-    //   float overallAngle = angleRight + angleLeft;
-    //   float targetAngle = overallAngle / 2.0;
-    //   float angError = targetAngle - angleLeft;
-
-    // } else if(angleLeft >= 0.0 && angleRight <= 0.0) {
-
-    //   // Robot needs to turn left
-
-    //   // Determine the overall angle of the junction
-    //   float overallAngle = angleLeft + angleRight;
-    //   float targetAngle = overallAngle / 2.0;
-    //   float angError = targetAngle - angleLeft;
-
-    // } else if(angleLeft <= 0.0 && angleRight >= 0.0) {
-
-    //   // Robot needs to turn Right
-
-    //   // Determine the overall angle of the junction
-    //   float overallAngle = angleLeft + angleRight;
-    //   float targetAngle = overallAngle / 2.0;
-    //   float angError = angleRight - targetAngle;
-      
-    // } else {
-      
-    // }
-
-    // Serial update
-    if(state != BOTH_WALLS) {
-      SerialUSB.println("BOTH");
-      state = BOTH_WALLS;
-    }
 
     // LED blink
     if((micros() - lastStatusPing) > 500000) {
@@ -149,18 +80,26 @@ bool GoTask2::update() {
       lastStatusPing = micros();
     }
     
-  } else if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR) {
-
-    leftMotor.set(0, Stepper::FORWARD);
-    rightMotor.set(0, Stepper::FORWARD);
+  } else if(d0 < 8.0 && d1 < 8.0) {
 
     // Left side against wall
 
-    // Serial update
+    // SerialUSB update
     if(state != LEFT_WALL) {
-      //SerialUSB.println("LEFT");
+      SerialUSB.println("LEFT");
       state = LEFT_WALL;
     }
+
+    float distDiff = distPD.Compute(aveDistLeft, 5.5);
+    float angDiff = angPD.Compute(-angleLeft, 0.0);
+
+    leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
+    rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
+
+    printDouble(8 + (angDiff + distDiff), 100);
+    SerialUSB.print(" ");
+    printDouble(8 - (angDiff + distDiff), 100);
+    SerialUSB.println();
     
     // LED blink
     if((micros() - lastStatusPing) > 500000) {
@@ -169,18 +108,26 @@ bool GoTask2::update() {
       lastStatusPing = micros();
     }
     
-  } else if(d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
-
-    leftMotor.set(0, Stepper::FORWARD);
-    rightMotor.set(0, Stepper::FORWARD);
+  } else if(d2 < 8.0 && d3 < 8.0) {
 
     // Right side against wall
 
-    // Serial update
+    // SerialUSB update
     if(state != RIGHT_WALL) {
-      //SerialUSB.println("RIGHT");
+      SerialUSB.println("RIGHT");
       state = RIGHT_WALL;
     }
+
+    float distDiff = distPD.Compute(aveDistRight, 5.5);
+    float angDiff = angPD.Compute(-angleRight, 0.0);
+
+    leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
+    rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
+
+    printDouble(8 + (angDiff + distDiff), 100);
+    SerialUSB.print(" ");
+    printDouble(8 - (angDiff + distDiff), 100);
+    SerialUSB.println();
 
     // LED blink
     if((micros() - lastStatusPing) > 500000) {
@@ -191,27 +138,26 @@ bool GoTask2::update() {
     
   } else {
 
-    // Serial update
+    // SerialUSB update
     if(state != NO_WALL) {
-      //SerialUSB.println("NO WALL");
+      SerialUSB.println("NO WALL");
       state = NO_WALL;
     }
 
+    leftMotor.set(6, Stepper::FORWARD);
+    rightMotor.set(6, Stepper::FORWARD);
+
   }
 
-  /*if(distance > 0) {
-    leftMotor.set(20, Stepper::FORWARD);
-    rightMotor.set(20, Stepper::FORWARD);
-  } else {
-    leftMotor.set(20, Stepper::BACKWARD);
-    rightMotor.set(20, Stepper::BACKWARD);
-  }
-
-  if(leftMotor.getCount() > steps) {
+  // Get count
+  stepsTraveled += (leftMotor.getCount() + rightMotor.getCount()) / 2.0;
+  //SerialUSB.println(stepsTraveled);
+  
+  if(stepsTraveled > stepsToTravel) {
     leftMotor.stop();
     rightMotor.stop();
     return true;
-  }*/
+  }
   
   return false;
 
@@ -244,10 +190,11 @@ void GoTask2::init() {
   SerialUSB.print(distPerStep);
   SerialUSB.print(" in.\n");
   
-  steps = distance / distPerStep;
+  stepsToTravel = distance / distPerStep;
+  stepsTraveled = 0;
   
   SerialUSB.print("Need to step: ");
-  SerialUSB.print(steps);
+  SerialUSB.print(stepsToTravel);
   SerialUSB.print(" times.\n");
 
   lastStatusPing = micros();
