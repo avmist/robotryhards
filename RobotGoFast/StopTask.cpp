@@ -9,7 +9,7 @@ StopTask::StopTask(Task * mom, Task * dad, String name) : Task(STOP, mom, dad, n
 }
 
 bool StopTask::update() {
-  //Serial.print("Stop Task");
+  //SerialUSB.print("Stop Task");
   Stepper::disableAll();
   state = COMPLETE;
   return false;

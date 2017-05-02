@@ -16,60 +16,19 @@ void GoTask2::initPID() {
 bool GoTask2::update() {
 
   float d0 = ir0.read();
-  /*if(d0 == LinearFit::TOO_FAR) {
-    Serial.print(" FAR ");
-  } else if(d0 == LinearFit::TOO_CLOSE) {
-    Serial.print("CLOSE");
-  } else {
-    printDouble(d0, 100);
-  }*/
-  
-  //Serial.print(" ");
-  
   float d1 = ir1.read();
-  /*if(d1 == LinearFit::TOO_FAR) {
-    Serial.print(" FAR ");
-  } else if(d1 == LinearFit::TOO_CLOSE) {
-    Serial.print("CLOSE");
-  } else {
-    printDouble(d1, 100);
-  }*/
-  
-  //Serial.print(" ");
-
-  float aveDistLeft = (d0 + d1) / 2.0;
-  
   float d2 = ir2.read();
-  /*if(d2 == LinearFit::TOO_FAR) {
-    Serial.print(" FAR ");
-  } else if(d2 == LinearFit::TOO_CLOSE) {
-    Serial.print("CLOSE");
-  } else {
-    printDouble(d2, 100);
-  }*/
-  
-  //Serial.print(" ");
-  
   float d3 = ir3.read();
-  /*if(d3 == LinearFit::TOO_FAR) {
-    Serial.print(" FAR ");
-  } else if(d3 == LinearFit::TOO_CLOSE) {
-    Serial.print("CLOSE");
-  } else {
-    printDouble(d3, 100);
-  }*/
-  
-  //Serial.print(" ");
-
+  float aveDistLeft = (d0 + d1) / 2.0;
   float aveDistRight = (d2 + d3) / 2.0;
 
   if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR && d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
 
     // Both sides against wall - best case for wall tracking
 
-    // Serial update
+    // SerialUSB update
     if(state != BOTH_WALLS) {
-      Serial.println("BOTH");
+      SerialUSB.println("BOTH");
       state = BOTH_WALLS;
     }
 
@@ -83,69 +42,35 @@ bool GoTask2::update() {
     float targetAngle = overallAngle / 2.0;
     float angError = targetAngle - angleLeft;
 
-    Serial.print("Ang Error: ");
+    SerialUSB.print("Ang Error: ");
     printDouble(angError, 10);
-    Serial.println();
+    SerialUSB.println();
 
     float distError = aveDistLeft - aveDistRight;
 
     float distDiff = distPD.Compute(distError, 0.0);
     float angDiff = angPD.Compute(angleLeft, targetAngle);
 
-    Serial.print("Ang diff: ");
+    SerialUSB.print("Ang diff: ");
     printDouble(angDiff, 10);
-    Serial.println();
+    SerialUSB.println();
 
-    Serial.print("Dist diff: ");
+    SerialUSB.print("Dist diff: ");
     printDouble(distDiff, 10);
-    Serial.println();
+    SerialUSB.println();
 
-    leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
-    rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
+    //leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
+    //rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
 
     printDouble(8 + (angDiff + distDiff), 100);
-    Serial.print(" ");
+    SerialUSB.print(" ");
     printDouble(8 - (angDiff + distDiff), 100);
-    Serial.println();
+    SerialUSB.println();
 
     // leftMotor.set(0, Stepper::FORWARD);
     // rightMotor.set(0, Stepper::FORWARD);
 
-    Serial.println();
-
-    // if(angleLeft >= 0.0 && angleRight >= 0.0) {
-
-    //   // Best case, both walls are angling outwards relative to us
-
-    //   // Simply match the angles;
-
-    //   float overallAngle = angleRight + angleLeft;
-    //   float targetAngle = overallAngle / 2.0;
-    //   float angError = targetAngle - angleLeft;
-
-    // } else if(angleLeft >= 0.0 && angleRight <= 0.0) {
-
-    //   // Robot needs to turn left
-
-    //   // Determine the overall angle of the junction
-    //   float overallAngle = angleLeft + angleRight;
-    //   float targetAngle = overallAngle / 2.0;
-    //   float angError = targetAngle - angleLeft;
-
-    // } else if(angleLeft <= 0.0 && angleRight >= 0.0) {
-
-    //   // Robot needs to turn Right
-
-    //   // Determine the overall angle of the junction
-    //   float overallAngle = angleLeft + angleRight;
-    //   float targetAngle = overallAngle / 2.0;
-    //   float angError = angleRight - targetAngle;
-      
-    // } else {
-      
-    // }
-
-
+    SerialUSB.println();
 
     // LED blink
     if((micros() - lastStatusPing) > 500000) {
@@ -161,9 +86,9 @@ bool GoTask2::update() {
 
     // Left side against wall
 
-    // Serial update
+    // SerialUSB update
     if(state != LEFT_WALL) {
-      Serial.println("LEFT");
+      SerialUSB.println("LEFT");
       state = LEFT_WALL;
     }
     
@@ -178,9 +103,9 @@ bool GoTask2::update() {
 
     // Right side against wall
 
-    // Serial update
+    // SerialUSB update
     if(state != RIGHT_WALL) {
-      Serial.println("RIGHT");
+      SerialUSB.println("RIGHT");
       state = RIGHT_WALL;
     }
 
@@ -196,9 +121,9 @@ bool GoTask2::update() {
     
   } else {
 
-    // Serial update
+    // SerialUSB update
     if(state != NO_WALL) {
-      Serial.println("NO WALL");
+      SerialUSB.println("NO WALL");
       state = NO_WALL;
     }
 
@@ -209,7 +134,7 @@ bool GoTask2::update() {
 
   // Get count
   stepsTraveled += (leftMotor.getCount() + rightMotor.getCount()) / 2.0;
-  //Serial.println(stepsTraveled);
+  //SerialUSB.println(stepsTraveled);
   
   if(stepsTraveled > stepsToTravel) {
     leftMotor.stop();
@@ -230,30 +155,30 @@ void GoTask2::init() {
   leftMotor.resetCount();
   rightMotor.resetCount();
   
-  Serial.print("Distance to travel: ");
-  Serial.print(distance);
-  Serial.print(" in.\n");
+  SerialUSB.print("Distance to travel: ");
+  SerialUSB.print(distance);
+  SerialUSB.print(" in.\n");
 
   // Calculate degree per step
   float degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
 
-  Serial.print("Deg per step: ");
-  Serial.print(degPerStep);
-  Serial.print(" deg.\n");
+  SerialUSB.print("Deg per step: ");
+  SerialUSB.print(degPerStep);
+  SerialUSB.print(" deg.\n");
 
   // Calculate distance per step
   float distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
 
-  Serial.print("Dist per step: ");
-  Serial.print(distPerStep);
-  Serial.print(" in.\n");
+  SerialUSB.print("Dist per step: ");
+  SerialUSB.print(distPerStep);
+  SerialUSB.print(" in.\n");
   
   stepsToTravel = distance / distPerStep;
   stepsTraveled = 0;
   
-  Serial.print("Need to step: ");
-  Serial.print(stepsToTravel);
-  Serial.print(" times.\n");
+  SerialUSB.print("Need to step: ");
+  SerialUSB.print(stepsToTravel);
+  SerialUSB.print(" times.\n");
 
   lastStatusPing = micros();
 

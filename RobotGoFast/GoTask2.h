@@ -22,16 +22,16 @@ class GoTask2 : public Task {
 
 public:
 
-	enum State { BOTH_WALLS, LEFT_WALL, RIGHT_WALL, NO_WALL };
+  enum State { BOTH_WALLS, LEFT_WALL, RIGHT_WALL, NO_WALL };
 
 private:
 
-	int distance;
-	PID distPD;
-	PID angPD;
-	unsigned long stepsToTravel, stepsTraveled;
-	unsigned long lastStatusPing;
-	State state;
+  int distance;
+  PID distPD;
+  PID angPD;
+  unsigned long stepsToTravel, stepsTraveled;
+  unsigned long lastStatusPing;
+  State state;
 
 public:
 

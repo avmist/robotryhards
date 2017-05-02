@@ -45,58 +45,36 @@ void Stepper::disableAll() {
 
 void Stepper::updateAll() {
 
-  int leftStesps = steppers[0]->update();
-  //Serial.println(leftStesps);
-  int rightSteps = steppers[1]->update();
-  //Serial.println(rightSteps);
-
-  //while(leftStesps || rightSteps) {
-
-      // Step Left if needed
-      if(leftStesps) {
-        digitalWrite(steppers[0]->stepPin, HIGH);
-        leftStesps--;
-      }
-
-      // Step Right if needed
-      if(rightSteps) {
-        digitalWrite(steppers[1]->stepPin, HIGH);
-        rightSteps--;
-      }
-
-      // Delay 2 uS
-      delayMicroseconds(2);
-
-      // Set both low
-      digitalWrite(steppers[0]->stepPin, LOW);
-      digitalWrite(steppers[1]->stepPin, LOW);
-
-      steppers[0]->stepCount += 1;
-      steppers[1]->stepCount += 1;
-
-      // Delay 2 uS
-      delayMicroseconds(2);
-
-  //}
+  steppers[0]->update();
+  steppers[1]->update();
   
 }
 
 // Methods
-int Stepper::update() {
+void Stepper::update() {
 
   // Time calculations
   unsigned long t = micros();
   unsigned long dt = t - lastUpdateTime;
 
   if(dt > delay) {
+
+    // Step motor
+    if(delay > 0) {
+
+      // Don't step if the speed is set to zero, just reset the lastUpdateTime
+      digitalWrite(stepPin, HIGH);
+      delayMicroseconds(2);
+      digitalWrite(stepPin, LOW);
+      delayMicroseconds(2);
+
+      stepCount++;
+      
+    }
     
     lastUpdateTime = t;
-
-    return (int) (dt / delay);
     
   }
-
-  return 0;
   
 }
 
@@ -137,7 +115,7 @@ void Stepper::set(float speed, Direction direction) {
   
   this->delay = secondsPerStep * 1000000.0f;
   
-  //Serial.println((int) this->delay);
+  //SerialUSB.println((int) this->delay);
   
 }
 
