@@ -37,7 +37,7 @@ float LinearFit::read() {
     
   }
   
-  //SerialUSB.print("raw ");
+  //Serial.print("raw ");
   return TOO_CLOSE;
   
 }

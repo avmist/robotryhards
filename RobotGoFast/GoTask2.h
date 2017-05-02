@@ -29,7 +29,7 @@ private:
 	int distance;
 	PID distPD;
 	PID angPD;
-	unsigned long steps;
+	unsigned long stepsToTravel, stepsTraveled;
 	unsigned long lastStatusPing;
 	State state;
 

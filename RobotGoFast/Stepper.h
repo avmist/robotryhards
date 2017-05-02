@@ -16,7 +16,7 @@ public:
   static const float wheelSpacing; // In inches
   static const unsigned long maxSpeed;
   
-private:
+protected:
 
   const int stepPin;
   const int dirPin;
@@ -51,7 +51,7 @@ public:
 
 private:
 
-  void update();
+  int update();
 
 };
 

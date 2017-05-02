@@ -12,49 +12,49 @@ bool GoTask::update() {
 
   float d0 = ir0.read();
   /*if(d0 == LinearFit::TOO_FAR) {
-    SerialUSB.print(" FAR ");
+    Serial.print(" FAR ");
   } else if(d0 == LinearFit::TOO_CLOSE) {
-    SerialUSB.print("CLOSE");
+    Serial.print("CLOSE");
   } else {
     printDouble(d0, 100);
   }*/
   
-  //SerialUSB.print(" ");
+  //Serial.print(" ");
   
   float d1 = ir1.read();
   /*if(d1 == LinearFit::TOO_FAR) {
-    SerialUSB.print(" FAR ");
+    Serial.print(" FAR ");
   } else if(d1 == LinearFit::TOO_CLOSE) {
-    SerialUSB.print("CLOSE");
+    Serial.print("CLOSE");
   } else {
     printDouble(d1, 100);
   }*/
   
-  //SerialUSB.print(" ");
+  //Serial.print(" ");
 
   float aveDistLeft = (d0 + d1) / 2.0;
   
   float d2 = ir2.read();
   /*if(d2 == LinearFit::TOO_FAR) {
-    SerialUSB.print(" FAR ");
+    Serial.print(" FAR ");
   } else if(d2 == LinearFit::TOO_CLOSE) {
-    SerialUSB.print("CLOSE");
+    Serial.print("CLOSE");
   } else {
     printDouble(d2, 100);
   }*/
   
-  //SerialUSB.print(" ");
+  //Serial.print(" ");
   
   float d3 = ir3.read();
   /*if(d3 == LinearFit::TOO_FAR) {
-    SerialUSB.print(" FAR ");
+    Serial.print(" FAR ");
   } else if(d3 == LinearFit::TOO_CLOSE) {
-    SerialUSB.print("CLOSE");
+    Serial.print("CLOSE");
   } else {
     printDouble(d3, 100);
   }*/
   
-  //SerialUSB.print(" ");
+  //Serial.print(" ");
 
   //float aveDistRight = (d2 + d3) / 2.0;	//TODO: find out what this does
   //Calculate seen wall points
@@ -73,21 +73,21 @@ bool GoTask::update() {
 
   //Calculate Intent
   Vec2 intent = (rightPos.unit() * -leftPos.size() + leftPos.unit() * -rightPos.size()).unit();	//avoid
-  SerialUSB.print("Avoid: ");
+  Serial.print("Avoid: ");
   printDouble(intent.x, 10);
-  SerialUSB.print(",   ");
+  Serial.print(",   ");
   printDouble(intent.y, 10);
   intent = intent + (leftDir * rightPos.size() + rightDir * leftPos.size()).unit();	//follow
-  SerialUSB.print("Follow: ");
+  Serial.print("Follow: ");
   printDouble(intent.unit().x, 10);
-  SerialUSB.print(",   ");
+  Serial.print(",   ");
   printDouble(intent.unit().y, 10);
   float turnAmt = Vec2(1.f, 0.f).cross(intent.unit());
 
   leftMotor.set(15 + turnAmt * 5, Stepper::FORWARD);
   rightMotor.set(15 - turnAmt * 5, Stepper::FORWARD);
 
-  SerialUSB.println();
+  Serial.println();
 
   if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR && d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
 
@@ -97,7 +97,7 @@ bool GoTask::update() {
       led.solid(LED::BLUE);
       led.solid(LED::RED);
       lastStatusPing = micros();
-      //SerialUSB.println("Both walls detected");
+      //Serial.println("Both walls detected");
     }
     
   } else if(d0 != LinearFit::TOO_FAR && d1 != LinearFit::TOO_FAR) {
@@ -108,7 +108,7 @@ bool GoTask::update() {
       led.solid(LED::BLUE);
       led.off(LED::RED);
       lastStatusPing = micros();
-      //SerialUSB.println("Left wall detected");
+      //Serial.println("Left wall detected");
     }
     
   } else if(d2 != LinearFit::TOO_FAR && d3 != LinearFit::TOO_FAR) {
@@ -119,7 +119,7 @@ bool GoTask::update() {
       led.solid(LED::RED);
       led.off(LED::BLUE);
       lastStatusPing = micros();
-      //SerialUSB.println("Right wall detected");
+      //Serial.println("Right wall detected");
     }
     
   }
@@ -149,29 +149,29 @@ void GoTask::init() {
   leftMotor.resetCount();
   rightMotor.resetCount();
   
-  SerialUSB.print("Distance to travel: ");
-  SerialUSB.print(distance);
-  SerialUSB.print(" in.\n");
+  Serial.print("Distance to travel: ");
+  Serial.print(distance);
+  Serial.print(" in.\n");
 
   // Calculate degree per step
   float degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
 
-  SerialUSB.print("Deg per step: ");
-  SerialUSB.print(degPerStep);
-  SerialUSB.print(" deg.\n");
+  Serial.print("Deg per step: ");
+  Serial.print(degPerStep);
+  Serial.print(" deg.\n");
 
   // Calculate distance per step
   float distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
 
-  SerialUSB.print("Dist per step: ");
-  SerialUSB.print(distPerStep);
-  SerialUSB.print(" in.\n");
+  Serial.print("Dist per step: ");
+  Serial.print(distPerStep);
+  Serial.print(" in.\n");
   
   steps = distance / distPerStep;
   
-  SerialUSB.print("Need to step: ");
-  SerialUSB.print(steps);
-  SerialUSB.print(" times.\n");
+  Serial.print("Need to step: ");
+  Serial.print(steps);
+  Serial.print(" times.\n");
 
   lastStatusPing = micros();
   

@@ -5,8 +5,8 @@ void printDouble(float val, unsigned int precision) {
 // NOTE: precision is 1 followed by the number of zeros for the desired number of decimial places
 // example: printDouble( 3.1415, 100); // prints 3.14 (two decimal places)
 
-   SerialUSB.print (int(val));  //prints the int part
-   SerialUSB.print("."); // print the decimal point
+   Serial.print (int(val));  //prints the int part
+   Serial.print("."); // print the decimal point
    unsigned int frac;
    if(val >= 0)
      frac = (val - int(val)) * precision;
@@ -17,7 +17,7 @@ void printDouble(float val, unsigned int precision) {
        precision /= 10;
    precision /= 10;
    while(  precision /= 10)
-       SerialUSB.print("0");
+       Serial.print("0");
 
-   SerialUSB.print(frac,DEC);
+   Serial.print(frac,DEC);
 }

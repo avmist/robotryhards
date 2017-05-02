@@ -10,11 +10,11 @@ void HLTM::init() {
 
 void HLTM::update() {
 
-  //SerialUSB.print("Boop\n");
+  //Serial.print("Boop\n");
 
   if(!currentTask) {
     
-    SerialUSB.print("Task is NULL\n");
+    Serial.print("Task is NULL\n");
     state = ERROR;
     
   } else if(currentTask->type == Task::START) {
@@ -59,9 +59,9 @@ void HLTM::update() {
     
   } else {
     
-    SerialUSB.print("Task is ");
-    SerialUSB.print(currentTask->type);
-    SerialUSB.print("\n");
+    Serial.print("Task is ");
+    Serial.print(currentTask->type);
+    Serial.print("\n");
     state = ERROR;
     
   }

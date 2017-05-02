@@ -4,10 +4,8 @@
 #include "Task.h"
 #include "Stepper.h"
 #include "PID.h"
-#include "IMU.h"
 #include "Vec2.h"
 
-extern IMU imu;
 extern Stepper leftMotor;
 extern Stepper rightMotor;
 

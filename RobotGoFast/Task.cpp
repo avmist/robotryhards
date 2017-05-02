@@ -43,15 +43,15 @@ void Task::addParent(Task * task) {
 }
 
 bool Task::update() {
-  SerialUSB.print("Task Task\n");
+  Serial.print("Task Task\n");
   state = ERROR;
   return false;
 }
 
 void Task::init() {
-  SerialUSB.print("\nTask ");
-  SerialUSB.print(name);
-  SerialUSB.print(" started.\n");
+  Serial.print("\nTask ");
+  Serial.print(name);
+  Serial.print(" started.\n");
 }
 
 Task * Task::getUntreversedChild() {
@@ -59,9 +59,9 @@ Task * Task::getUntreversedChild() {
   for(int i = 0; i < numChildren; ++i) {
 
     if(children[i]->traversed == false) { 
-      /*SerialUSB.print("Transitioning to ");
-      SerialUSB.print(children[i]->type);
-      SerialUSB.print("\n");*/
+      /*Serial.print("Transitioning to ");
+      Serial.print(children[i]->type);
+      Serial.print("\n");*/
       return children[i];
     }
     
@@ -70,7 +70,7 @@ Task * Task::getUntreversedChild() {
   state = ERROR;
   Stepper::disableAll();
 
-  SerialUSB.print("Transitioning to NULL");
+  Serial.print("Transitioning to NULL");
   return NULL;
   
 }

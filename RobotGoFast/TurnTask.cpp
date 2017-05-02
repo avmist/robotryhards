@@ -10,53 +10,6 @@ TurnTask::TurnTask(Task * mom, Task * dad, float deg, String name) : Task(TURN, 
 
 bool TurnTask::update() {
 
-  // Start per gyro code
-
-  /*Vec2 currentVec = Vec2::fromPolarDeg(1.0, imu.yaw);
-
-  float angle = currentVec.angleTo(finalVec);
-  angle *= 180.f / PI;
-
-  float speed;
-
-  if(angle > 0) {
-
-    speed = pid.Compute(angle, 0);
-
-    // Turn right
-    SerialUSB.println(" Right");
-    leftMotor.set(abs(speed), Stepper::FORWARD);
-    rightMotor.set(abs(speed), Stepper::BACKWARD);
-
-  } else {
-
-    speed = pid.Compute(angle, 0);
-
-    // Turn left
-    SerialUSB.println(" Left");
-    leftMotor.set(abs(speed), Stepper::BACKWARD);
-    rightMotor.set(abs(speed), Stepper::FORWARD);
-
-  }
-
-  SerialUSB.print("Ang ");
-  printDouble(angle, 100);
-  SerialUSB.print(" Spd ");
-  printDouble(speed, 100);
-  //SerialUSB.println();
-
-  if(abs(angle) < 1.0) {
-    samples--;
-  }
-
-  if(samples <= 0) {
-    leftMotor.stop();
-    rightMotor.stop();
-    return true;
-  }
-  
-  return false;*/
-
   // Start per steps code
 
   float speed;
@@ -72,7 +25,7 @@ bool TurnTask::update() {
     // Turn right
     speed = pid.Compute(steps, 0);
 
-    SerialUSB.println("Right ");
+    Serial.println("Right ");
     leftMotor.set(abs(speed), Stepper::FORWARD);
     rightMotor.set(abs(speed), Stepper::BACKWARD);
 
@@ -83,7 +36,7 @@ bool TurnTask::update() {
     speed = pid.Compute(steps, 0);
 
     // Turn left
-    SerialUSB.println("Left ");
+    Serial.println("Left ");
     leftMotor.set(abs(speed), Stepper::BACKWARD);
     rightMotor.set(abs(speed), Stepper::FORWARD);
 
@@ -91,11 +44,11 @@ bool TurnTask::update() {
 
   }
 
-  SerialUSB.print("Steps ");
+  Serial.print("Steps ");
   printDouble(steps, 100);
-  SerialUSB.print(" Spd ");
+  Serial.print(" Spd ");
   printDouble(speed, 100);
-  SerialUSB.println();
+  Serial.println();
 
   if(abs(steps) <= 5) {
     leftMotor.stop();
@@ -115,35 +68,35 @@ void TurnTask::init() {
   rightMotor.resetCount();
 
   // Capture IMU yaw
-  initialVec = Vec2::fromPolarDeg(1.0, imu.yaw);
-  finalVec = Vec2::fromPolarDeg(1.0, fmod(imu.yaw + deg, 360));
+  //initialVec = Vec2::fromPolarDeg(1.0, imu.yaw);
+  //finalVec = Vec2::fromPolarDeg(1.0, fmod(imu.yaw + deg, 360));
 
   // Calculate distance to move
   float distnce = PI * Stepper::wheelSpacing * deg / 360.f;
 
-  SerialUSB.print("Arc distance to travel: ");
-  SerialUSB.print(distnce);
-  SerialUSB.print(" in.\n");
+  Serial.print("Arc distance to travel: ");
+  Serial.print(distnce);
+  Serial.print(" in.\n");
 
   // Calculate degree per step
   float degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
 
-  SerialUSB.print("Deg per step: ");
-  SerialUSB.print(degPerStep);
-  SerialUSB.print(" deg.\n");
+  Serial.print("Deg per step: ");
+  Serial.print(degPerStep);
+  Serial.print(" deg.\n");
 
   // Calculate distance per step
   float distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
 
-  SerialUSB.print("Dist per step: ");
-  SerialUSB.print(distPerStep);
-  SerialUSB.print(" in.\n");
+  Serial.print("Dist per step: ");
+  Serial.print(distPerStep);
+  Serial.print(" in.\n");
   
   steps = distnce / distPerStep;
   
-  SerialUSB.print("Need to step: ");
-  SerialUSB.print(steps);
-  SerialUSB.print(" times.\n");
+  Serial.print("Need to step: ");
+  Serial.print(steps);
+  Serial.print(" times.\n");
   
 }
 
