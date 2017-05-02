@@ -59,12 +59,21 @@ bool GoTask2::update() {
     printDouble(distDiff, 10);
     SerialUSB.println();
 
+<<<<<<< HEAD
     //leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
     //rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
 
     printDouble(8 + (angDiff + distDiff), 100);
     SerialUSB.print(" ");
     printDouble(8 - (angDiff + distDiff), 100);
+=======
+    leftMotor.set(6 - diff, Stepper::FORWARD);
+    rightMotor.set(6 + diff, Stepper::FORWARD);
+
+    printDouble(6 - diff, 100);
+    SerialUSB.print(" ");
+    printDouble(6 + diff, 100);
+>>>>>>> parent of 9e6135a... Working PD
     SerialUSB.println();
 
     // leftMotor.set(0, Stepper::FORWARD);
