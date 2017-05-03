@@ -1,19 +1,88 @@
 #include "GoTask2.h"
 
-GoTask2::GoTask2(Task * parent, float distance, String name) : Task(GO, parent, name) {
-  this->distance = distance;
-}
-
-GoTask2::GoTask2(Task * mom, Task * dad, float distance, String name) : Task(GO, mom, dad, name) {
+GoTask2::GoTask2(Task * parent, float distance, String name) : Task(GO2, parent, name) {
   this->distance = distance;
 }
 
 void GoTask2::initPID() {
-  distPD = PID(0.8, 0.0, 0.4, -6.0, 6.0);
-  angPD = PID(0.4, 0.0, 0.2, -4.0, 4.0);
+  distPD = PID(0.8, 0.0, 0.5, -6.0, 6.0);
+  angPD = PID(0.2, 0.0, 0.3, -2.0, 2.0);
 }
 
 bool GoTask2::update() {
+
+  // ToF code from adafruit exmaple
+  uint8_t range = vl.readRange();
+  uint8_t status = vl.readRangeStatus();
+
+  if (status == VL6180X_ERROR_NONE) {
+    //SerialUSB.print("Range: "); SerialUSB.println(range);
+  }
+
+  // Some error occurred, print it out!
+  
+  if((status >= VL6180X_ERROR_SYSERR_1) && (status <= VL6180X_ERROR_SYSERR_5)) {
+    SerialUSB.println("System error");
+  }
+  else if (status == VL6180X_ERROR_ECEFAIL) {
+    SerialUSB.println("ECE failure");
+  }
+  else if (status == VL6180X_ERROR_NOCONVERGE) {
+    SerialUSB.println("No convergence");
+  }
+  else if (status == VL6180X_ERROR_RANGEIGNORE) {
+    SerialUSB.println("Ignoring range");
+  }
+  else if (status == VL6180X_ERROR_SNR) {
+    SerialUSB.println("Signal/Noise error");
+  }
+  else if (status == VL6180X_ERROR_RAWUFLOW) {
+    SerialUSB.println("Raw reading underflow");
+  }
+  else if (status == VL6180X_ERROR_RAWOFLOW) {
+    SerialUSB.println("Raw reading overflow");
+  }
+  else if (status == VL6180X_ERROR_RANGEUFLOW) {
+    SerialUSB.println("Range reading underflow");
+  }
+  else if (status == VL6180X_ERROR_RANGEOFLOW) {
+    SerialUSB.println("Range reading overflow");
+  }
+
+  // Convert mm to in
+  float distnace = range * 0.0393701;
+
+  if(distnace < 1.5 && backtracking == NOT_BACKTRACKING) {
+
+    noInterrupts();
+    leftMotor.stop();
+    rightMotor.stop();
+    interrupts();
+
+    float degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
+    float distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
+    int closeEnoughStepCount = 3.0 / distPerStep;
+
+    // Are we close enough to our target?
+
+    if(abs(stepsToTravel - stepsTraveled) < closeEnoughStepCount) {
+
+      SerialUSB.println("Close enough complete.");
+
+      traversed = true;
+      return END;
+
+    } else {
+
+      SerialUSB.println("Obstacle detected.");
+
+      backtracking = BACKTRACKING;
+      stepsToTravel = stepsTraveled;
+      stepsTraveled = 0;
+
+    }
+
+  }
 
   float d0 = ir0.read();  
   float d1 = ir1.read();
@@ -23,10 +92,10 @@ bool GoTask2::update() {
   float d3 = ir3.read();
   float aveDistRight = (d2 + d3) / 2.0;
 
-  float angleLeft = atan2(d0 - d1, IR_SPACING);
+  float angleLeft = backtracking * atan2(d0 - d1, IR_SPACING);
   angleLeft = angleLeft * 180.0 / PI;
 
-  float angleRight = atan2(d2 - d3, IR_SPACING);
+  float angleRight = backtracking * atan2(d2 - d3, IR_SPACING);
   angleRight = angleRight * 180.0 / PI;
 
   if(d0 < 8.0 && d1 < 8.0 && d2 < 8.0 && d3 < 8.0) {
@@ -52,26 +121,35 @@ bool GoTask2::update() {
     float distDiff = distPD.Compute(distError, 0.0);
     float angDiff = angPD.Compute(angleLeft, targetAngle);
 
-    SerialUSB.print("Ang diff: ");
-    printDouble(angDiff, 10);
-    SerialUSB.println();
+    // SerialUSB.print("Ang diff: ");
+    // printDouble(angDiff, 10);
+    // SerialUSB.println();
 
-    SerialUSB.print("Dist diff: ");
-    printDouble(distDiff, 10);
-    SerialUSB.println();
+    // SerialUSB.print("Dist diff: ");
+    // printDouble(distDiff, 10);
+    // SerialUSB.println();
 
-    leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
-    rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
+    if(backtracking == NOT_BACKTRACKING) {
+      noInterrupts();
+      leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
+      rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
+      interrupts();
+    } else {
+      noInterrupts();
+      leftMotor.set(8 + (angDiff + distDiff), Stepper::BACKWARD);
+      rightMotor.set(8 - (angDiff + distDiff), Stepper::BACKWARD);
+      interrupts();
+    }
 
-    printDouble(8 + (angDiff + distDiff), 100);
-    SerialUSB.print(" ");
-    printDouble(8 - (angDiff + distDiff), 100);
-    SerialUSB.println();
+    // printDouble(8 + (angDiff + distDiff), 100);
+    // SerialUSB.print(" ");
+    // printDouble(8 - (angDiff + distDiff), 100);
+    // SerialUSB.println();
 
     // leftMotor.set(0, Stepper::FORWARD);
     // rightMotor.set(0, Stepper::FORWARD);
 
-    SerialUSB.println();
+    // SerialUSB.println();
 
     // LED blink
     if((micros() - lastStatusPing) > 500000) {
@@ -93,13 +171,22 @@ bool GoTask2::update() {
     float distDiff = distPD.Compute(aveDistLeft, 5.5);
     float angDiff = angPD.Compute(-angleLeft, 0.0);
 
-    leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
-    rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
+    if(backtracking == NOT_BACKTRACKING) {
+      noInterrupts();
+      leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
+      rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
+      interrupts();
+    } else {
+      noInterrupts();
+      leftMotor.set(8 + (angDiff + distDiff), Stepper::BACKWARD);
+      rightMotor.set(8 - (angDiff + distDiff), Stepper::BACKWARD);
+      interrupts();
+    }
 
-    printDouble(8 + (angDiff + distDiff), 100);
-    SerialUSB.print(" ");
-    printDouble(8 - (angDiff + distDiff), 100);
-    SerialUSB.println();
+    // printDouble(8 + (angDiff + distDiff), 100);
+    // SerialUSB.print(" ");
+    // printDouble(8 - (angDiff + distDiff), 100);
+    // SerialUSB.println();
     
     // LED blink
     if((micros() - lastStatusPing) > 500000) {
@@ -121,13 +208,22 @@ bool GoTask2::update() {
     float distDiff = distPD.Compute(aveDistRight, 5.5);
     float angDiff = angPD.Compute(-angleRight, 0.0);
 
-    leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
-    rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
+    if(backtracking == NOT_BACKTRACKING) {
+      noInterrupts();
+      leftMotor.set(8 + (angDiff + distDiff), Stepper::FORWARD);
+      rightMotor.set(8 - (angDiff + distDiff), Stepper::FORWARD);
+      interrupts();
+    } else {
+      noInterrupts();
+      leftMotor.set(8 + (angDiff + distDiff), Stepper::BACKWARD);
+      rightMotor.set(8 - (angDiff + distDiff), Stepper::BACKWARD);
+      interrupts();
+    }
 
-    printDouble(8 + (angDiff + distDiff), 100);
-    SerialUSB.print(" ");
-    printDouble(8 - (angDiff + distDiff), 100);
-    SerialUSB.println();
+    // printDouble(8 + (angDiff + distDiff), 100);
+    // SerialUSB.print(" ");
+    // printDouble(8 - (angDiff + distDiff), 100);
+    // SerialUSB.println();
 
     // LED blink
     if((micros() - lastStatusPing) > 500000) {
@@ -144,8 +240,17 @@ bool GoTask2::update() {
       state = NO_WALL;
     }
 
-    leftMotor.set(6, Stepper::FORWARD);
-    rightMotor.set(6, Stepper::FORWARD);
+    if(backtracking == NOT_BACKTRACKING) {
+      noInterrupts();
+      leftMotor.set(7, Stepper::FORWARD);
+      rightMotor.set(7, Stepper::FORWARD);
+      interrupts();
+    } else {
+      noInterrupts();
+      leftMotor.set(7, Stepper::BACKWARD);
+      rightMotor.set(7, Stepper::BACKWARD);
+      interrupts();
+    }
 
   }
 
@@ -154,18 +259,34 @@ bool GoTask2::update() {
   //SerialUSB.println(stepsTraveled);
   
   if(stepsTraveled > stepsToTravel) {
+
+    noInterrupts();
     leftMotor.stop();
     rightMotor.stop();
-    return true;
+    interrupts();
+
+    SerialUSB.println("Complete.");
+
+    if(backtracking == BACKTRACKING) {
+
+      traversed = true;
+      return BACKTRACK;
+
+    }
+
+    traversed = true;
+    return END;
+
   }
   
-  return false;
+  return CONTINUE;
 
 }
 
 void GoTask2::init() {
 
   state = NO_WALL;
+  backtracking = NOT_BACKTRACKING;
   
   Task::init();
 

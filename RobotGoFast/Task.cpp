@@ -9,7 +9,7 @@ Task::Task(Type type, Task * parent, String name) : name(name), type(type) {
   if(parent) {
     
     // Add to parents list
-    addParent(parent);
+    setParent(parent);
 
     // Add to parents children list
     parent->addChild(this);
@@ -18,34 +18,21 @@ Task::Task(Type type, Task * parent, String name) : name(name), type(type) {
   
 }
 
-Task::Task(Type type, Task * mom, Task * dad, String name) : name(name), type(type) {
-
-  numParents = 0;
-  numChildren = 0;
-  traversed = false;
-
-  // Add to parents list
-  addParent(mom);
-  addParent(dad);
-
-  // Add to children list
-  mom->addChild(this);
-  dad->addChild(this);
-  
-}
-
 void Task::addChild(Task * task) {
   children[numChildren++] = task;
 }
 
-void Task::addParent(Task * task) {
-  parents[numParents++] = task;
+void Task::setParent(Task * task) {
+  parent = task;
+}
+
+Task * Task::getParent() {
+  return this->parent;
 }
 
 bool Task::update() {
   SerialUSB.print("Task Task\n");
-  state = ERROR;
-  return false;
+  return Task::ERROR;
 }
 
 void Task::init() {
@@ -67,10 +54,10 @@ Task * Task::getUntreversedChild() {
     
   }
 
-  state = ERROR;
   Stepper::disableAll();
 
   SerialUSB.print("Transitioning to NULL");
+  
   return NULL;
   
 }

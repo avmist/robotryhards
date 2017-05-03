@@ -7,6 +7,7 @@
 #include "StartTask.h"
 #include "StopTask.h"
 #include "GoTask.h"
+#include "GoTask2.h"
 
 class HLTM {
 
@@ -26,6 +27,8 @@ public:
   // Methods
   void update();
   void init();
+  void initCurrentTask();
+  int updateCurrentTask();
 
 private:
   

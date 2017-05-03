@@ -24,7 +24,6 @@ public:
 
   // Constructors
   TurnTask(Task * parent, float deg, String name);
-  TurnTask(Task * mom, Task * dad, float deg, String name);
 
   // Methods
   bool update() override;

@@ -1,3 +1,4 @@
+#include "Adafruit_VL6180X.h"
 #include "Stepper.h"
 #include "Task.h"
 #include "RobotState.h"
@@ -29,48 +30,18 @@ LinearFit ir1(A1);
 LinearFit ir2(A2);
 LinearFit ir3(A3);
 
-// Turn test
-// StartTask turn(NULL, "Start");
-// TurnTask turn1(&turn, 90, "Turn 1");
-// DelayTask turn2(&turn1, 2000000, "Delay 2s");
-// TurnTask turn3(&turn2, -90, "Turn 2");
-// DelayTask turn4(&turn3, 2000000, "Delay 2s");
-// TurnTask turn5(&turn4, 180, "Turn 3");
-// DelayTask turn6(&turn5, 2000000, "Delay 2s");
-// TurnTask turn7(&turn6, -180, "Turn 4");
-// DelayTask turn8(&turn7, 2000000, "Delay 2s");
-// TurnTask turn9(&turn8, 360, "Turn 5");
-// DelayTask turn10(&turn9, 2000000, "Delay 2s");
-// TurnTask turn11(&turn10, -360, "Turn 6");
-// DelayTask turn12(&turn11, 2000000, "Delay 2s");
-// StopTask turn13(&turn12, "End");
-
-// Square test
-// StartTask square(NULL, "Start");
-// TurnTask square1(&square, 90, "Turn 1");
-// DelayTask square2(&square1, 2000000, "Delay 2s");
-// GoTask square3(&square2, 24, "Go 24 in");
-// TurnTask square4(&square3, 90, "Turn 2");
-// DelayTask square5(&square4, 2000000, "Delay 2s");
-// GoTask square6(&square5, 24, "Go 24 in");
-// TurnTask square7(&square6, 90, "Turn 3");
-// DelayTask square8(&square7, 2000000, "Delay 2s");
-// GoTask square9(&square8, 24, "Go 24 in");
-// TurnTask square10(&square9, 90, "Turn 4");
-// DelayTask square11(&square10, 2000000, "Delay 2s");
-// GoTask square12(&square11, 24, "Go 24 in");
-// StopTask square13(&square12, "End");
+Adafruit_VL6180X vl = Adafruit_VL6180X();
 
 // Go test
 StartTask go(NULL, "Start");
-GoTask2 go1(&go, 52, "Go 52\" South");
+GoTask2 go1(&go, 53, "Go 52\" South");
 TurnTask go2(&go1, -90, "Turn left 90 deg");
 GoTask2 go3(&go2, 35, "Go 35\" East");
 GoTask2 go4(&go3, 50, "Go 50\" East");
 TurnTask go5(&go4, 90, "Turn right 90 deg");
 GoTask2 go6(&go5, 12, "Go 12\" South");
 TurnTask go7(&go6, -90, "Turn left 90 deg");
-GoTask2 go8(&go7, 22, "Go 22\" South");
+GoTask2 go8(&go7, 23, "Go 23\" East");
 TurnTask go9(&go8, 90, "Turn right 90 deg");
 GoTask2 go10(&go9, 50, "Go 50\" South");
 StopTask goEnd(&go10, "End");
@@ -97,9 +68,20 @@ void TC4_Handler() {
 
 void setup() {
 
+  analogWriteResolution(10);
+
   SerialUSB.begin(115200);
 
-  analogWriteResolution(10);
+  // From Adafruit example
+  // wait for serial port to open on native usb devices
+  while(!Serial) {
+    delay(1);
+  }
+
+  if(!vl.begin()) {
+    SerialUSB.println("Failed to connect to ToF.");
+    while(1);
+  }
 
   pinMode(Stepper::enablePin, OUTPUT);
 
@@ -233,9 +215,6 @@ void loop() {
 
   // Do HLTM
   hal.update();
-
-  // Do position update
-  //imu.update();
   
   // Stepper update
   //Stepper::updateAll();
@@ -251,44 +230,6 @@ void loop() {
 unsigned long lastStatusPing = 0;
 
 void debug() {
-
-  //SerialUSB.println("<3");
-
-  /*SerialUSB.print("P ");
-  printfloat(imu.pitch, 100);
-  SerialUSB.print(" Y ");
-  printfloat(imu.yaw, 100);
-  SerialUSB.print(" R ");
-  printfloat(imu.roll, 100);*/
-  // SerialUSB.print(" H ");
-  // printfloat(imu.heading, 100);
-  // //SerialUSB.println();
-
-  // SerialUSB.print(" C ");
-  // printfloat(imu.mag[0], 100);
-  // SerialUSB.print(" C ");
-  // printfloat(imu.mag[1], 100);
-  // SerialUSB.print(" C ");
-  // printfloat(imu.mag[2], 100);
-  // SerialUSB.println();
-
-  /*SerialUSB.print("G ");
-  printfloat(imu.gyro[0], 100);
-  SerialUSB.print(" G ");
-  printfloat(imu.gyro[1], 100);
-  SerialUSB.print(" G ");
-  printfloat(imu.gyro[2], 100);
-  SerialUSB.println();
-
-  SerialUSB.println();*/
-
-  /*SerialUSB.print(as0.analogReadSmooth(ir0));
-  SerialUSB.print(" ");
-  SerialUSB.print(as1.analogReadSmooth(ir1));
-  SerialUSB.print(" ");
-  SerialUSB.print(as2.analogReadSmooth(ir2));
-  SerialUSB.print(" ");
-  SerialUSB.println(as3.analogReadSmooth(ir3));*/
   
   if(state == IDLE && (micros() - lastStatusPing) > 500000) {
     

@@ -4,10 +4,6 @@ TurnTask::TurnTask(Task * parent, float deg, String name) : Task(TURN, parent, n
   this->deg = deg;
 }
 
-TurnTask::TurnTask(Task * mom, Task * dad, float deg, String name) : Task(TURN, mom, dad, name), pid(0.05, 0.0, 0.15, -12.0, 12.0) {
-  this->deg = deg;
-}
-
 bool TurnTask::update() {
 
   // Start per steps code
@@ -26,8 +22,11 @@ bool TurnTask::update() {
     speed = pid.Compute(steps, 0);
 
     SerialUSB.println("Right ");
+
+    noInterrupts();
     leftMotor.set(abs(speed), Stepper::FORWARD);
     rightMotor.set(abs(speed), Stepper::BACKWARD);
+    interrupts();
 
     direction = true;
 
@@ -37,8 +36,11 @@ bool TurnTask::update() {
 
     // Turn left
     SerialUSB.println("Left ");
+
+    noInterrupts();
     leftMotor.set(abs(speed), Stepper::BACKWARD);
     rightMotor.set(abs(speed), Stepper::FORWARD);
+    interrupts();
 
     direction = false;
 
@@ -51,12 +53,18 @@ bool TurnTask::update() {
   SerialUSB.println();
 
   if(abs(steps) <= 5) {
+
+    noInterrupts();
     leftMotor.stop();
     rightMotor.stop();
-    return true;
+    interrupts();
+
+    traversed = true;
+    return END;
+
   }
 
-  return false;
+  return CONTINUE;
 
 }
 

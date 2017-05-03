@@ -11,13 +11,15 @@ class Task {
 
 public:
 
-  enum Type { START = 1, STOP = 0, TURN = 2, DELAY = 3, GO = 4 };
+  enum Return { CONTINUE = 0, END = 1, BACKTRACK = 2, ERROR = -1 };
+
+  enum Type { START = 1, STOP = 0, TURN = 2, DELAY = 3, GO = 4, GO2 = 5 };
   const String name;
   const Type type;
 
 protected:
 
-  Task * parents[2];
+  Task * parent;
   int numParents;
   Task * children[2];
   int numChildren;
@@ -33,12 +35,13 @@ public:
   virtual bool update();
   virtual void init();
   Task * getUntreversedChild();
+  Task * getParent();
 
 private:
 
   // Methods
   void addChild(Task * task);
-  void addParent(Task * task);
+  void setParent(Task * task);
   
 };
 
