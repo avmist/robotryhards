@@ -1,20 +1,21 @@
 #include "StartTask.h"
 
-StartTask::StartTask(Task * parent, String name) : Task(START, parent, name) {
-  
-}
+StartTask::StartTask(Task * parent, String name) : Task(START, parent, name) { }
 
-StartTask::StartTask(Task * mom, Task * dad, String name) : Task(START, mom, dad, name) {
-  
-}
+int StartTask::update() {
 
-bool StartTask::update() {
   Stepper::enableAll();
+
   state = RUNNING;
+
   traversed = true;
-  return true;
+
+  return END;
+  
 }
 
 void StartTask::init() {
+
   Task::init();
+
 }

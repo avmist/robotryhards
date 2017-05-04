@@ -21,13 +21,13 @@ extern LinearFit ir3;
 
 extern Adafruit_VL6180X vl;
 
+extern Backtracking backtracking;
+
 class GoTask2 : public Task {
 
 public:
 
   enum State { BOTH_WALLS, LEFT_WALL, RIGHT_WALL, NO_WALL };
-
-  enum Backtracking { BACKTRACKING = -1, NOT_BACKTRACKING = 1 };
 
 private:
 
@@ -36,15 +36,14 @@ private:
   PID angPD;
   unsigned long stepsToTravel, stepsTraveled;
   unsigned long lastStatusPing;
-  State state;
-  Backtracking backtracking;
+  State wallState;
 
 public:
 
   // Constructors
   GoTask2(Task * parent, float distance, String name);
   // Methods
-  bool update() override;
+  int update() override;
   void init() override;
   void initPID();
   

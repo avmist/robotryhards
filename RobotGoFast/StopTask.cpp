@@ -4,17 +4,18 @@ StopTask::StopTask(Task * parent, String name) : Task(STOP, parent, name) {
   
 }
 
-StopTask::StopTask(Task * mom, Task * dad, String name) : Task(STOP, mom, dad, name) {
+int StopTask::update() {
 
-}
-
-bool StopTask::update() {
-  //SerialUSB.print("Stop Task");
   Stepper::disableAll();
+
   state = COMPLETE;
-  return false;
+
+  return CONTINUE;
+  
 }
 
 void StopTask::init() {
+
   Task::init();
+
 }

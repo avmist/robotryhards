@@ -4,11 +4,7 @@ DelayTask::DelayTask(Task * parent, unsigned long delay, String name) : Task(DEL
   this->delay = delay;
 }
 
-DelayTask::DelayTask(Task * mom, Task * dad, unsigned long delay, String name) : Task(DELAY, mom, dad, name) {
-  this->delay = delay;
-}
-
-bool DelayTask::update() {
+int DelayTask::update() {
 
   unsigned long dt = micros() - startTime;
   

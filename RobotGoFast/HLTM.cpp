@@ -12,8 +12,11 @@ void HLTM::initCurrentTask() {
 
   if(!currentTask) {
 
-    SerialUSB.print("Task is NULL\n");
     state = ERROR;
+
+    while(true) {
+      SerialUSB.print("Task is NULL\n");
+    }
     
   } else if(currentTask->type == Task::START) {
 
@@ -39,12 +42,6 @@ void HLTM::initCurrentTask() {
     
     delayTask->init();
     
-  } else if(currentTask->type == Task::GO) {
-
-    GoTask * goTask = static_cast<GoTask*>(currentTask);
-
-    goTask->init();
-    
   } else if(currentTask->type == Task::GO2) {
 
     GoTask2 * goTask2 = static_cast<GoTask2*>(currentTask);
@@ -52,11 +49,16 @@ void HLTM::initCurrentTask() {
     goTask2->init();
     
   } else {
-    
-    SerialUSB.print("Task is ");
-    SerialUSB.print(currentTask->type);
-    SerialUSB.print("\n");
+
     state = ERROR;
+
+    while(true) {
+
+      SerialUSB.print("Task is ");
+      SerialUSB.print(currentTask->type);
+      SerialUSB.print("\n");
+
+    }
     
   }
 
@@ -66,8 +68,12 @@ int HLTM::updateCurrentTask() {
 
   if(!currentTask) {
 
-    SerialUSB.print("Task is NULL\n");
     state = ERROR;
+
+    while(true) {
+      SerialUSB.print("Task is NULL\n");
+    }
+
     return Task::ERROR;
     
   } else if(currentTask->type == Task::START) {
@@ -94,12 +100,6 @@ int HLTM::updateCurrentTask() {
     
     return delayTask->update();
     
-  } else if(currentTask->type == Task::GO) {
-
-    GoTask * goTask = static_cast<GoTask*>(currentTask);
-
-    return goTask->update();
-    
   } else if(currentTask->type == Task::GO2) {
 
     GoTask2 * goTask2 = static_cast<GoTask2*>(currentTask);
@@ -108,10 +108,15 @@ int HLTM::updateCurrentTask() {
     
   } else {
     
-    SerialUSB.print("Task is ");
-    SerialUSB.print(currentTask->type);
-    SerialUSB.print("\n");
     state = ERROR;
+
+    while(true) {
+
+      SerialUSB.print("Task is ");
+      SerialUSB.print(currentTask->type);
+      SerialUSB.print("\n");
+
+    }
 
     return Task::ERROR;
     
@@ -121,32 +126,83 @@ int HLTM::updateCurrentTask() {
 
 void HLTM::update() {
 
-  //SerialUSB.print("Boop\n");
+  int taskStatus = updateCurrentTask();
 
-  int status = updateCurrentTask();
+  if(taskStatus == Task::ERROR) {
+    
+    state = ERROR;
 
-  if(status == Task::ERROR) {
-    
-    SerialUSB.print("Task returned error.\n");
-    
     // Busy wait
-    while(true);
+    while(true) {
+      SerialUSB.print("Task returned error.\n");
+    }
 
-  }
+  } else if(taskStatus == Task::END) {
 
-  if(status == Task::END) {
+    SerialUSB.print("Task ");
+    SerialUSB.print(currentTask->name);
+    SerialUSB.println(" ended.");
+    SerialUSB.println();
 
-    currentTask = currentTask->getUntreversedChild();
+    // Are we backtracking?
+    if(backtracking == NOT_BACKTRACKING) {
 
-    initCurrentTask();
+      SerialUSB.println("Not backtracking, advancing to next task...");
 
-  } else if(status == Task::BACKTRACK) {
+      // No
 
-    currentTask = currentTask->getParent();
+      // Do next task
+      currentTask = currentTask->getUntreversedChild();
 
-    currentTask = currentTask->getUntreversedChild();
+      initCurrentTask();
 
-    initCurrentTask();
+    } else {
+
+      // Yes
+
+      // Is there a branch here?
+      Task * previousTask = currentTask->getParent();
+
+      if(previousTask == NULL) {
+
+        state = ERROR;
+
+        // Busy wait
+        while(true) {
+          SerialUSB.println("Error: Parent is NULL");
+        }
+
+      }
+
+      Task * previousTaskChild = previousTask->getUntreversedChild();
+
+      if(previousTaskChild) {
+
+        // Branch exists, go there
+
+        SerialUSB.print("Branching to ");
+        SerialUSB.println(previousTaskChild->name);
+
+        backtracking = NOT_BACKTRACKING;
+
+        currentTask = previousTaskChild;
+
+        initCurrentTask();
+
+      } else {
+
+        // No, go back
+
+        SerialUSB.print("Reverting to ");
+        SerialUSB.println(previousTask->name);
+
+        currentTask = previousTask;
+
+        initCurrentTask();
+
+      }
+
+    }
 
   }
   

@@ -11,10 +11,9 @@ public:
 
   // Constructors
   StartTask(Task * parent, String name);
-  StartTask(Task * mom, Task * dad, String name);
 
   // Methods
-  bool update() override;
+  int update() override;
   void init() override;
   
 };

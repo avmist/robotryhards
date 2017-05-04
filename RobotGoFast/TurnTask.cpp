@@ -1,27 +1,22 @@
 #include "TurnTask.h"
 
-TurnTask::TurnTask(Task * parent, float deg, String name) : Task(TURN, parent, name), pid(0.05, 0.0, 0.15, -12.0, 12.0) {
+TurnTask::TurnTask(Task * parent, float deg, String name) : Task(TURN, parent, name) {
   this->deg = deg;
 }
 
-bool TurnTask::update() {
+int TurnTask::update() {
+
+  SerialUSB.println("Turn update...");
 
   // Start per steps code
 
-  float speed;
-
-  if(direction) {
-    steps -= leftMotor.getCount() + rightMotor.getCount() / 2;
-  } else {
-    steps += leftMotor.getCount() + rightMotor.getCount() / 2;
-  }
+  float speed = pid.Compute(steps, 0);
 
   if(steps > 0) {
 
     // Turn right
-    speed = pid.Compute(steps, 0);
-
-    SerialUSB.println("Right ");
+    
+    //SerialUSB.println("Right ");
 
     noInterrupts();
     leftMotor.set(abs(speed), Stepper::FORWARD);
@@ -32,10 +27,8 @@ bool TurnTask::update() {
 
   } else {
 
-    speed = pid.Compute(steps, 0);
-
     // Turn left
-    SerialUSB.println("Left ");
+    //SerialUSB.println("Left ");
 
     noInterrupts();
     leftMotor.set(abs(speed), Stepper::BACKWARD);
@@ -46,11 +39,17 @@ bool TurnTask::update() {
 
   }
 
-  SerialUSB.print("Steps ");
-  printDouble(steps, 100);
-  SerialUSB.print(" Spd ");
-  printDouble(speed, 100);
-  SerialUSB.println();
+  if(direction) {
+    steps -= leftMotor.getCount() + rightMotor.getCount() / 2;
+  } else {
+    steps += leftMotor.getCount() + rightMotor.getCount() / 2;
+  }
+
+  // SerialUSB.print("Steps ");
+  // printDouble(steps, 100);
+  // SerialUSB.print(" Spd ");
+  // printDouble(speed, 100);
+  // SerialUSB.println();
 
   if(abs(steps) <= 5) {
 
@@ -72,11 +71,13 @@ void TurnTask::init() {
   
   Task::init();
 
+  pid = PID(0.05, 0.0, 0.15, -12.0, 12.0);
+
   leftMotor.resetCount();
   rightMotor.resetCount();
 
   // Calculate distance to move
-  float distnce = PI * Stepper::wheelSpacing * deg / 360.f;
+  float distnce = PI * Stepper::wheelSpacing * backtracking * deg / 360.f;
 
   SerialUSB.print("Arc distance to travel: ");
   SerialUSB.print(distnce);

@@ -14,10 +14,9 @@ public:
 
   // Constructors
   DelayTask(Task * parent, unsigned long delay, String name);
-  DelayTask(Task * mom, Task * dad, unsigned long delay, String name);
 
   // Methods
-  bool update() override;
+  int update() override;
   void init() override;
   
 };

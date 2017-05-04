@@ -9,6 +9,8 @@
 extern Stepper leftMotor;
 extern Stepper rightMotor;
 
+extern Backtracking backtracking;
+
 class TurnTask : public Task {
 
 private:
@@ -16,8 +18,6 @@ private:
   float deg;
   long steps;
   PID pid;
-  Vec2 initialVec, finalVec;
-  int samples = 50;
   bool direction = true;
 
 public:
@@ -26,7 +26,7 @@ public:
   TurnTask(Task * parent, float deg, String name);
 
   // Methods
-  bool update() override;
+  int update() override;
   void init() override;
 
   // Statics

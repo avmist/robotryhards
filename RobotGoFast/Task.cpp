@@ -2,14 +2,13 @@
 
 Task::Task(Type type, Task * parent, String name) : name(name), type(type) {
 
-  numParents = 0;
   numChildren = 0;
   traversed = false; 
   
   if(parent) {
     
     // Add to parents list
-    setParent(parent);
+    this->parent = parent;
 
     // Add to parents children list
     parent->addChild(this);
@@ -18,19 +17,29 @@ Task::Task(Type type, Task * parent, String name) : name(name), type(type) {
   
 }
 
-void Task::addChild(Task * task) {
-  children[numChildren++] = task;
+void Task::print(int depth) {
+
+  for(int i = 0; i < depth; ++i) {
+    SerialUSB.print("- ");
+  }
+
+  SerialUSB.println(name);
+
+  for(int i = 0; i < numChildren; ++i) {
+    children[i]->print(depth + 1);
+  }
+
 }
 
-void Task::setParent(Task * task) {
-  parent = task;
+void Task::addChild(Task * task) {
+  children[numChildren++] = task;
 }
 
 Task * Task::getParent() {
   return this->parent;
 }
 
-bool Task::update() {
+int Task::update() {
   SerialUSB.print("Task Task\n");
   return Task::ERROR;
 }
@@ -43,21 +52,34 @@ void Task::init() {
 
 Task * Task::getUntreversedChild() {
 
+  SerialUSB.print("Task ");
+  SerialUSB.print(this->name);
+  SerialUSB.print(" has ");
+  SerialUSB.print(numChildren);
+  SerialUSB.println(" children.");
+
   for(int i = 0; i < numChildren; ++i) {
 
-    if(children[i]->traversed == false) { 
-      /*SerialUSB.print("Transitioning to ");
-      SerialUSB.print(children[i]->type);
-      SerialUSB.print("\n");*/
+    if(children[i]->traversed == false) {
+
+      // SerialUSB.print("Transitioning to ");
+      // SerialUSB.print(children[i]->name);
+      // SerialUSB.print("\n");
+
       return children[i];
+
+    } else {
+
+      SerialUSB.print("Task ");
+      SerialUSB.print(children[i]->name);
+      SerialUSB.println(" traversed.");
+
     }
     
   }
 
-  Stepper::disableAll();
+  //Stepper::disableAll();
 
-  SerialUSB.print("Transitioning to NULL");
-  
   return NULL;
   
 }

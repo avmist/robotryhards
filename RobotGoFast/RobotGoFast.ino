@@ -30,28 +30,46 @@ LinearFit ir1(A1);
 LinearFit ir2(A2);
 LinearFit ir3(A3);
 
-Adafruit_VL6180X vl = Adafruit_VL6180X();
-
-// Go test
-StartTask go(NULL, "Start");
-GoTask2 go1(&go, 53, "Go 52\" South");
-TurnTask go2(&go1, -90, "Turn left 90 deg");
-GoTask2 go3(&go2, 35, "Go 35\" East");
-GoTask2 go4(&go3, 50, "Go 50\" East");
-TurnTask go5(&go4, 90, "Turn right 90 deg");
-GoTask2 go6(&go5, 12, "Go 12\" South");
-TurnTask go7(&go6, -90, "Turn left 90 deg");
-GoTask2 go8(&go7, 23, "Go 23\" East");
-TurnTask go9(&go8, 90, "Turn right 90 deg");
-GoTask2 go10(&go9, 50, "Go 50\" South");
-StopTask goEnd(&go10, "End");
-
 enum RobotState state = IDLE;
+
+Backtracking backtracking = NOT_BACKTRACKING;
 
 Stepper leftMotor(1, 0, false);
 Stepper rightMotor(3, 2, true);
 
 LED led(13, 12, 11);
+
+Adafruit_VL6180X vl = Adafruit_VL6180X();
+
+// Task tree
+StartTask go(NULL, "Start");
+
+// P1
+GoTask2 p1_0(&go, 49, "Go 49 South");
+TurnTask p1_1(&p1_0, -90, "Turn left 90 deg"); // P1 Back jumping point
+GoTask2 p1_2(&p1_1, 35, "Go 35 East");
+
+// P4
+GoTask2 p4_0(&p1_2, 50, "Go 50 East");
+TurnTask p4_1(&p4_0, 90, "Turn right 90 deg");
+GoTask2 p4_2(&p4_1, 12, "Go 12 South");
+
+// P6
+TurnTask p6_0(&p4_2, -90, "Turn left 90 deg");
+GoTask2 p6_1(&p6_0, 24, "Go 24 South");
+TurnTask p6_2(&p6_1, 90, "Turn right 90 deg");
+GoTask2 p6_3(&p6_2, 50, "Go 50 South");
+StopTask p6_4(&p6_3, "End");
+
+// P2
+TurnTask p2_1(&go, -90, "Turn left 90 deg");
+GoTask2 p2_2(&p2_1, 36, "Go 36 East");
+TurnTask p2_3(&p2_2, 90, "Turn right 90 deg");
+GoTask2 p2_4(&p2_3, 24, "Go 24 South");
+TurnTask p2_5(&p2_4, -90, "Turn left 90 deg");
+StopTask p2_6(&p2_5, "End");
+
+// P5
 
 HLTM hal(&go);
 
@@ -77,6 +95,8 @@ void setup() {
   while(!Serial) {
     delay(1);
   }
+
+  //SerialUSB.print("Setup start...");
 
   if(!vl.begin()) {
     SerialUSB.println("Failed to connect to ToF.");
@@ -209,9 +229,14 @@ void setup() {
 
   hal.init();
 
+  //SerialUSB.println("   Complete.");
+
 }
 
 void loop() {
+
+  // Do debug output
+  debug();
 
   // Do HLTM
   hal.update();
@@ -222,14 +247,19 @@ void loop() {
   // LED Update
   LED::updateAll();
   
-  // Do debug output
-  debug();
-  
 }
 
 unsigned long lastStatusPing = 0;
 
 void debug() {
+
+  static int foo = 0;
+
+  if(foo == 0) {
+    delay(4000);
+    go.print(0);
+    foo = 1;
+  }
   
   if(state == IDLE && (micros() - lastStatusPing) > 500000) {
     
