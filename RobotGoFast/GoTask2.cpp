@@ -86,17 +86,8 @@ int GoTask2::update() {
       SerialUSB.println("Obstacle detected.");
       SerialUSB.println();
 
-      float degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
-      float distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
-
-      SerialUSB.println((int) stepsTraveled);
-      // Add one inch to account for stopping drift
-      stepsTraveled += 1.25 / distPerStep;
-      SerialUSB.println((int) stepsTraveled);
-      SerialUSB.println();
-
       backtracking = BACKTRACKING;
-      stepsToTravel = stepsTraveled;
+      stepsToTravel = stepsTraveled - 600;
       stepsTraveled = 0;
 
     }
@@ -117,13 +108,12 @@ int GoTask2::update() {
   float angleRight = backtracking * atan2(d2 - d3, IR_SPACING);
   angleRight = angleRight * 180.0 / PI;
 
-  if(d0 < 6.5 && d1 < 6.5 && d2 < 6.5 && d3 < 6.5 && !dontTrack) {
+  if(d0 < 8.0 && d1 < 8.0 && d2 < 8.0 && d3 < 8.0) {
 
     // Both sides against wall - best case for wall tracking
 
     // SerialUSB update
     if(wallState != BOTH_WALLS) {
-
       SerialUSB.println("BOTH");
       wallState = BOTH_WALLS;
     }
@@ -148,16 +138,6 @@ int GoTask2::update() {
     // SerialUSB.print("Dist diff: ");
     // printDouble(distDiff, 10);
     // SerialUSB.println();
-
-    float degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
-    float distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
-
-    // Add one inch to account for stopping drift
-    unsigned long driftDist = 13 / distPerStep;
-
-    if(stepsToTravel < driftDist) {
-      distDiff = distDiff / 2;
-    }
 
     if(backtracking == NOT_BACKTRACKING) {
 
@@ -192,7 +172,7 @@ int GoTask2::update() {
       lastStatusPing = micros();
     }
     
-  } else if(d0 < 6.5 && d1 < 6.5 && !dontTrack) {
+  } else if(d0 < 8.0 && d1 < 8.0) {
 
     // Left side against wall
 
@@ -204,15 +184,6 @@ int GoTask2::update() {
 
     float distDiff = distPD.Compute(aveDistLeft, 5.5);
     float angDiff = angPD.Compute(-angleLeft, 0.0);
-
-    float degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
-    float distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
-
-    unsigned long driftDist = 13 / distPerStep;
-
-    if(stepsToTravel < driftDist) {
-      distDiff = 0;
-    }
 
     if(backtracking == NOT_BACKTRACKING) {
       noInterrupts();
@@ -238,7 +209,7 @@ int GoTask2::update() {
       lastStatusPing = micros();
     }
     
-  } else if(d2 < 6.5 && d3 < 6.5 && !dontTrack) {
+  } else if(d2 < 8.0 && d3 < 8.0) {
 
     // Right side against wall
 
@@ -250,15 +221,6 @@ int GoTask2::update() {
 
     float distDiff = distPD.Compute(aveDistRight, 5.5);
     float angDiff = angPD.Compute(-angleRight, 0.0);
-
-    float degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
-    float distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
-
-    unsigned long driftDist = 13 / distPerStep;
-
-    if(stepsToTravel < driftDist) {
-      distDiff = 0;
-    }
 
     if(backtracking == NOT_BACKTRACKING) {
 
@@ -292,27 +254,8 @@ int GoTask2::update() {
 
     // SerialUSB update
     if(wallState != NO_WALL) {
-
       SerialUSB.println("NO WALL");
       wallState = NO_WALL;
-
-      // Go 8 in
-      // float degPerStep = 360.f / (Stepper::stepsPerRevolution * Stepper::microsteps);
-      // float distPerStep = PI * Stepper::wheelDiameter * (degPerStep / 360.f);
-
-      // unsigned long fixedDist = 6.0 / distPerStep;
-
-      // if(stepsToTravel > fixedDist * 0.90 && stepsToTravel < fixedDist * 1.10) {
-
-      //   SerialUSB.println("Junction near end detected, going fixed distance.");
-      //   stepsToTravel = fixedDist;
-
-      //   led.solid(LED::RED);
-      //   led.solid(LED::GREEN);
-      //   led.solid(LED::BLUE);
-
-      // }
-
     }
 
     if(backtracking == NOT_BACKTRACKING) {
