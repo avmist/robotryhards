@@ -1,5 +1,9 @@
 #include "StartTask.h"
 
+StartTask::StartTask() {
+	
+}
+
 StartTask::StartTask(Task * parent, String name) : Task(START, parent, name) { }
 
 int StartTask::update() {

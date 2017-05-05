@@ -16,6 +16,7 @@ void HLTM::initCurrentTask() {
 
     while(true) {
       SerialUSB.print("Task is NULL\n");
+      delay(100);
     }
     
   } else if(currentTask->type == Task::START) {
@@ -57,6 +58,7 @@ void HLTM::initCurrentTask() {
       SerialUSB.print("Task is ");
       SerialUSB.print(currentTask->type);
       SerialUSB.print("\n");
+      delay(100);
 
     }
     
@@ -66,12 +68,15 @@ void HLTM::initCurrentTask() {
 
 int HLTM::updateCurrentTask() {
 
+  //SerialUSB.println("Update");
+
   if(!currentTask) {
 
     state = ERROR;
 
     while(true) {
       SerialUSB.print("Task is NULL\n");
+      delay(100);
     }
 
     return Task::ERROR;
@@ -115,6 +120,7 @@ int HLTM::updateCurrentTask() {
       SerialUSB.print("Task is ");
       SerialUSB.print(currentTask->type);
       SerialUSB.print("\n");
+      delay(100);
 
     }
 
@@ -135,6 +141,7 @@ void HLTM::update() {
     // Busy wait
     while(true) {
       SerialUSB.print("Task returned error.\n");
+      delay(100);
     }
 
   } else if(taskStatus == Task::END) {
@@ -170,6 +177,7 @@ void HLTM::update() {
         // Busy wait
         while(true) {
           SerialUSB.println("Error: Parent is NULL");
+          delay(100);
         }
 
       }

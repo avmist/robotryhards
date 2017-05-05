@@ -12,16 +12,16 @@
 #include "HLTM.h"
 #include "math.h"
 
-/* ST    P2    X  X  X  X  X  X
- *    X  X     X  X  X  X  X  X
- *    X  X  J2    P5       X  X
- *    X  X  P3 X  X  X     X  X
- * P1       J1    P4       X  X
- * X  X  X  X  X  X  X  J3        
- * X  X  X  X  X  X  X  X  X   
- * X  X  X  X  X  X  X  X  X  P6
- * X  X  X  X  X  X  X  X  X   
- * X  X  X  X  X  X  X  X  X  ED
+/* ST    P2    X  X  X  X  X  X  X
+ *    X  X     X  X  X  X  X  X  X
+ *    X  X  J2    P5       X  X  X
+ *    X  X  P3 X  X  X     X  X  X
+ * P1       J1    P4       X  X  X
+ * X  X  X     X  X  X J3        X   
+ * X  X  X     X  P6       X  P7 X
+ * X  X  X     X     X  X  X     X
+ * X  X  X           X  X  X     X
+ * X  X  X  X  X  X  X  X  X  ED X
  */
 
 // Globals
@@ -44,32 +44,58 @@ Adafruit_VL6180X vl = Adafruit_VL6180X();
 // Task tree
 StartTask go(NULL, "Start");
 
-// P1
-GoTask2 p1_0(&go, 49, "Go 49 South");
-TurnTask p1_1(&p1_0, -90, "Turn left 90 deg"); // P1 Back jumping point
-GoTask2 p1_2(&p1_1, 35, "Go 35 East");
+// P7
+GoTask2 p7_start(NULL, 24, "Go 24 South");
+TurnTask p7_1(&p7_start, 90, "Turn right 90 deg");
+GoTask2 p7_2(&p7_1, 50, "Go 50 South");
+StopTask p7_end(&p7_2, "End");
 
-// P4
-GoTask2 p4_0(&p1_2, 50, "Go 50 East");
-TurnTask p4_1(&p4_0, 90, "Turn right 90 deg");
-GoTask2 p4_2(&p4_1, 12, "Go 12 South");
+// // P4
+GoTask2 p4_start(NULL, 52, "Go 52 East");
+TurnTask p4_1(&p4_start, 90, "Turn right 90 deg");
+GoTask2 p4_2(&p4_1, 13, "Go 13 South", true);
+TurnTask p4_end(&p4_2, -90, "Turn left 90 deg");
+
+// P1
+GoTask2 p1_start(NULL, 50, "Go 50 South");
+TurnTask p1_1(&p1_start, -90, "Turn left 90 deg"); // P1 Back jumping point
+GoTask2 p1_end(&p1_1, 35, "Go 35 East");
 
 // P6
-TurnTask p6_0(&p4_2, -90, "Turn left 90 deg");
-GoTask2 p6_1(&p6_0, 24, "Go 24 South");
-TurnTask p6_2(&p6_1, 90, "Turn right 90 deg");
-GoTask2 p6_3(&p6_2, 50, "Go 50 South");
-StopTask p6_4(&p6_3, "End");
-
-// P2
-TurnTask p2_1(&go, -90, "Turn left 90 deg");
-GoTask2 p2_2(&p2_1, 36, "Go 36 East");
-TurnTask p2_3(&p2_2, 90, "Turn right 90 deg");
-GoTask2 p2_4(&p2_3, 24, "Go 24 South");
-TurnTask p2_5(&p2_4, -90, "Turn left 90 deg");
-StopTask p2_6(&p2_5, "End");
+TurnTask p6_start(NULL, 90, "Turn right 90 deg");
+GoTask2 p6_1(&p6_start, 52, "Go 52 South");
+TurnTask p6_2(&p6_1, -90, "Turn left 90 deg");
+GoTask2 p6_3(&p6_2, 24, "Go 24 East");
+TurnTask p6_4(&p6_3, -90, "Turn left 90 deg");
+GoTask2 p6_5(&p6_4, 24, "Go 24 North");
+TurnTask p6_6(&p6_5, 90, "Turn right 90 deg");
+GoTask2 p6_7(&p6_6, 24, "Go 24 East");
+TurnTask p6_8(&p6_7, -90, "Turn left 90 deg");
+GoTask2 p6_9(&p6_8, 12, "Go 12 North");
+TurnTask p6_end(&p6_9, 90, "Turn right 90 deg");
 
 // P5
+GoTask2 p5_start(NULL, 52, "Go 52 East");
+TurnTask p5_1(&p5_start, 90, "Turn right 90 deg");
+GoTask2 p5_2(&p5_1, 23, "Go 23 South", true);
+TurnTask p5_end(&p5_2, -90, "Turn left 90 deg");
+
+// P3 Up
+TurnTask p3u_start(NULL, -90, "Turn left 90 deg");
+GoTask2 p3u_1(&p3u_start, 24, "Go 24 North");
+TurnTask p3u_end(&p3u_1, 90, "Turn right 90 deg");
+
+// // P3 Down
+TurnTask p3d_start(NULL, 90, "Turn right 90 deg");
+GoTask2 p3d_1(&p3d_start, 24, "Go 24 South");
+TurnTask p3d_end(&p3d_1, -90, "Turn left 90 deg");
+
+// P2
+TurnTask p2_start(NULL, -90, "Turn left 90 deg");
+GoTask2 p2_1(&p2_start, 36, "Go 36 East");
+TurnTask p2_2(&p2_1, 105, "Turn right 105 deg");
+GoTask2 p2_3(&p2_2, 24, "Go 24 South");
+TurnTask p2_end(&p2_3, -90, "Turn left 90 deg");
 
 HLTM hal(&go);
 
@@ -87,6 +113,29 @@ void TC4_Handler() {
 void setup() {
 
   analogWriteResolution(10);
+
+  // Inital paths
+  p1_start.setParent(&go);
+  p2_start.setParent(&go);
+
+  // J1
+  p5_start.setParent(&p2_end);
+  p3d_start.setParent(&p2_end);
+
+  p3u_end.addChild(&p5_start);
+
+  // J2
+  p4_start.setParent(&p1_end);
+  p3u_start.setParent(&p1_end);
+  p6_start.setParent(&p1_end);
+  
+  p3d_end.addChild(&p4_start);
+  p3d_end.addChild(&p6_start);
+  
+  // J3
+  p4_end.addChild(&p7_start);
+  p5_end.addChild(&p7_start);
+  p6_end.addChild(&p7_start);
 
   SerialUSB.begin(115200);
 
@@ -255,11 +304,11 @@ void debug() {
 
   static int foo = 0;
 
-  if(foo == 0) {
-    delay(4000);
-    go.print(0);
-    foo = 1;
-  }
+  // if(foo == 0) {
+  //   delay(8000);
+  //   go.print(0);
+  //   foo = 1;
+  // }
   
   if(state == IDLE && (micros() - lastStatusPing) > 500000) {
     

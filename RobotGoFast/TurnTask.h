@@ -23,6 +23,7 @@ private:
 public:
 
   // Constructors
+  TurnTask();
   TurnTask(Task * parent, float deg, String name);
 
   // Methods

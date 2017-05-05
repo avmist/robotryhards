@@ -31,17 +31,21 @@ public:
 
 private:
 
-  int distance;
+  const float distance;
   PID distPD;
   PID angPD;
   unsigned long stepsToTravel, stepsTraveled;
   unsigned long lastStatusPing;
   State wallState;
+  bool dontTrack;
 
 public:
 
   // Constructors
+  GoTask2();
   GoTask2(Task * parent, float distance, String name);
+  GoTask2(Task * parent, float distance, String name, bool dontTrack);
+  
   // Methods
   int update() override;
   void init() override;

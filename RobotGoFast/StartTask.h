@@ -10,6 +10,7 @@ private:
 public:
 
   // Constructors
+  StartTask();
   StartTask(Task * parent, String name);
 
   // Methods

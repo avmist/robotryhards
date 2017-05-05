@@ -18,6 +18,7 @@ public:
   
 private:
 
+  const unsigned long startupTime;
   const int stepPin;
   const int dirPin;
   const bool reversed;

@@ -11,7 +11,7 @@ const float Stepper::wheelSpacing = 4.491; // In inches
 const unsigned long Stepper::maxSpeed = 21; // Inches / Second
 
 // Constructors
-Stepper::Stepper(int stepPin, int dirPin, bool reversed) : stepPin(stepPin), dirPin(dirPin), reversed(reversed) {
+Stepper::Stepper(int stepPin, int dirPin, bool reversed) : stepPin(stepPin), dirPin(dirPin), reversed(reversed), startupTime(micros()) {
 
   // Initialize members
   stepCount = 0;
@@ -61,6 +61,13 @@ void Stepper::setLow() {
 
 // Methods
 void Stepper::update() {
+
+  if(startupTime + 3*60*1000000 < micros()) {
+
+    SerialUSB.println("Stepper timeout.");
+    Stepper::disableAll();
+
+  }
 
   // Time calculations
   unsigned long t = micros();

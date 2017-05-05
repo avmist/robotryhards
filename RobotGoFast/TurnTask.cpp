@@ -1,12 +1,16 @@
 #include "TurnTask.h"
 
+TurnTask::TurnTask() {
+  
+}
+
 TurnTask::TurnTask(Task * parent, float deg, String name) : Task(TURN, parent, name) {
   this->deg = deg;
 }
 
 int TurnTask::update() {
 
-  SerialUSB.println("Turn update...");
+  //SerialUSB.println("Turn update...");
 
   // Start per steps code
 

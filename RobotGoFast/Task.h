@@ -20,7 +20,7 @@ public:
 protected:
 
   Task * parent;
-  Task * children[2];
+  Task * children[3];
   int numChildren;
   bool traversed;
   
@@ -28,18 +28,20 @@ public:
 
   // Constructors
   Task(Type type, Task * parent, String name);
+  Task();
 
   // Methods
   virtual int update();
   virtual void init();
   Task * getUntreversedChild();
   Task * getParent();
+  void setParent(Task * task);
   void print(int depth);
+  void addChild(Task * task);
 
 private:
 
-  // Methods
-  void addChild(Task * task);
+
   
 };
 

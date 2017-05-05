@@ -1,5 +1,9 @@
 #include "Task.h"
 
+Task::Task() : type(STOP) {
+
+}
+
 Task::Task(Type type, Task * parent, String name) : name(name), type(type) {
 
   numChildren = 0;
@@ -33,6 +37,14 @@ void Task::print(int depth) {
 
 void Task::addChild(Task * task) {
   children[numChildren++] = task;
+}
+
+void Task::setParent(Task * task) {
+  
+  parent = task;
+
+  task->addChild(this);
+
 }
 
 Task * Task::getParent() {
